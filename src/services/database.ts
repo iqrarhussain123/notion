@@ -48,6 +48,187 @@ const DEFAULT_PROJECT: Project = {
   adminId: 'usr_iqrar',
 };
 
+// ── Admin credential & workspace integrity ──────────────────────────────
+
+export const ensureAdminUsers = (state: AppState): boolean => {
+  let modified = false;
+  if (state.project && (state.project.name === 'TaskFlow Project' || state.project.key === 'TASK')) {
+    state.project.name = 'Cinemora Studios';
+    state.project.key = 'CIN';
+    state.project.description = 'Cinemora Studios internal creative, content, web, and AI agency workspace.';
+    modified = true;
+  }
+  if (!Array.isArray(state.users)) {
+    state.users = [DEFAULT_ADMIN, DEFAULT_ASHMAAD];
+    return true;
+  }
+  const adminUser = state.users.find(u => u.role === 'admin' || u.id === 'usr_iqrar' || u.id === 'admin-1' || u.email === 'iqrar@cinemorastudios.com' || u.email === 'admin@company.com');
+  if (adminUser) {
+    adminUser.name = 'Iqrar Hussain';
+    adminUser.email = 'iqrar@cinemorastudios.agency';
+    adminUser.password = 'I&s&c123$$';
+    adminUser.role = 'admin';
+    modified = true;
+  } else if (!state.users.some(u => u.email.trim().toLowerCase() === 'iqrar@cinemorastudios.agency')) {
+    state.users.unshift(DEFAULT_ADMIN);
+    modified = true;
+  }
+
+  const ashmaadUser = state.users.find(u => {
+    const em = u.email.trim().toLowerCase();
+    return em === 'ashmaad@cinemorastudios.agency' || em === 'ishmaad@cinemorastudios.agency' || u.id === 'usr_ashmaad';
+  });
+  if (ashmaadUser) {
+    ashmaadUser.name = 'Ashmaad';
+    ashmaadUser.email = 'ashmaad@cinemorastudios.agency';
+    ashmaadUser.password = 'A&s&c123$$';
+    ashmaadUser.role = 'admin';
+    modified = true;
+  } else if (!state.users.some(u => u.email.trim().toLowerCase() === 'ashmaad@cinemorastudios.agency')) {
+    state.users.push(DEFAULT_ASHMAAD);
+    modified = true;
+  }
+  return modified;
+};
+
+// ── Cloudflare D1 Multi-Device Sync ──────────────────────────────────────
+
+export const CLOUDFLARE_WORKER_URL = 'https://cinemora-os-staging.iqrarworksatcinemora.workers.dev';
+export const SYNC_STATUS_KEY = 'cinemora_cf_sync_status';
+
+export interface SyncStatus {
+  status: 'idle' | 'syncing' | 'synced' | 'error';
+  lastSyncedAt: string | null;
+  version: number;
+  errorMessage?: string;
+}
+
+export const getSyncStatus = (): SyncStatus => {
+  const raw = localStorage.getItem(SYNC_STATUS_KEY);
+  if (raw) {
+    try {
+      return JSON.parse(raw);
+    } catch {}
+  }
+  return { status: 'idle', lastSyncedAt: null, version: 1 };
+};
+
+type SyncListener = (status: SyncStatus) => void;
+const syncListeners: Set<SyncListener> = new Set();
+
+export const subscribeSyncStatus = (listener: SyncListener): (() => void) => {
+  syncListeners.add(listener);
+  listener(getSyncStatus());
+  return () => {
+    syncListeners.delete(listener);
+  };
+};
+
+const setSyncStatus = (patch: Partial<SyncStatus>) => {
+  const current = getSyncStatus();
+  const next: SyncStatus = { ...current, ...patch };
+  localStorage.setItem(SYNC_STATUS_KEY, JSON.stringify(next));
+  syncListeners.forEach(fn => {
+    try { fn(next); } catch {}
+  });
+};
+
+let pushDebounceTimer: any = null;
+
+export const pushToCloudflare = async (immediate = false): Promise<boolean> => {
+  return new Promise((resolve) => {
+    if (pushDebounceTimer) clearTimeout(pushDebounceTimer);
+
+    const executePush = async () => {
+      try {
+        setSyncStatus({ status: 'syncing' });
+        const data = getData();
+        const currentStatus = getSyncStatus();
+
+        const response = await fetch(`${CLOUDFLARE_WORKER_URL}/api/workspace/sync`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ data, version: currentStatus.version }),
+        });
+
+        if (!response.ok) {
+          throw new Error(`Cloudflare sync failed: HTTP ${response.status}`);
+        }
+
+        const resJson = (await response.json()) as { status: string; version: number; timestamp: string };
+        const nextVersion = resJson.version || (currentStatus.version + 1);
+        const timestamp = resJson.timestamp || new Date().toISOString();
+
+        setSyncStatus({
+          status: 'synced',
+          version: nextVersion,
+          lastSyncedAt: timestamp,
+          errorMessage: undefined,
+        });
+        resolve(true);
+      } catch (err: any) {
+        console.warn('[Cloudflare Sync] Push error:', err);
+        setSyncStatus({
+          status: 'error',
+          errorMessage: err?.message || 'Sync failed',
+        });
+        resolve(false);
+      }
+    };
+
+    if (immediate) {
+      executePush();
+    } else {
+      pushDebounceTimer = setTimeout(executePush, 500);
+    }
+  });
+};
+
+export const pullFromCloudflare = async (): Promise<AppState | null> => {
+  try {
+    setSyncStatus({ status: 'syncing' });
+    const response = await fetch(`${CLOUDFLARE_WORKER_URL}/api/workspace/state`);
+    if (!response.ok) {
+      throw new Error(`Cloudflare fetch failed: HTTP ${response.status}`);
+    }
+
+    const resJson = (await response.json()) as {
+      status: string;
+      data?: AppState;
+      version?: number;
+      updatedAt?: string;
+    };
+
+    if (resJson.status === 'not_found' || !resJson.data) {
+      // Remote D1 is empty: seed it with current local state!
+      const current = getData();
+      await pushToCloudflare(true);
+      return current;
+    }
+
+    const remoteState = resJson.data;
+    if (remoteState && remoteState.project) {
+      ensureAdminUsers(remoteState);
+      saveData(remoteState, false);
+      setSyncStatus({
+        status: 'synced',
+        version: resJson.version || 1,
+        lastSyncedAt: resJson.updatedAt || new Date().toISOString(),
+        errorMessage: undefined,
+      });
+      return remoteState;
+    }
+    return null;
+  } catch (err: any) {
+    console.warn('[Cloudflare Sync] Pull error:', err);
+    setSyncStatus({
+      status: 'error',
+      errorMessage: err?.message || 'Sync failed',
+    });
+    return null;
+  }
+};
+
 // ── Core DB ────────────────────────────────────────────────────────────────
 
 export const initializeDatabase = (): AppState => {
@@ -55,42 +236,7 @@ export const initializeDatabase = (): AppState => {
   if (existing) {
     try {
       const parsed = JSON.parse(existing) as AppState;
-      // Seamlessly migrate previous TaskFlow defaults to Cinemora Studios without wiping issues/sprints
-      let modified = false;
-      if (parsed.project && (parsed.project.name === 'TaskFlow Project' || parsed.project.key === 'TASK')) {
-        parsed.project.name = 'Cinemora Studios';
-        parsed.project.key = 'CIN';
-        parsed.project.description = 'Cinemora Studios internal creative, content, web, and AI agency workspace.';
-        modified = true;
-      }
-      if (Array.isArray(parsed.users)) {
-        const adminUser = parsed.users.find(u => u.role === 'admin' || u.id === 'usr_iqrar' || u.id === 'admin-1' || u.email === 'iqrar@cinemorastudios.com' || u.email === 'admin@company.com');
-        if (adminUser) {
-          adminUser.name = 'Iqrar Hussain';
-          adminUser.email = 'iqrar@cinemorastudios.agency';
-          adminUser.password = 'I&s&c123$$';
-          adminUser.role = 'admin';
-          modified = true;
-        } else if (!parsed.users.some(u => u.email.trim().toLowerCase() === 'iqrar@cinemorastudios.agency')) {
-          parsed.users.unshift(DEFAULT_ADMIN);
-          modified = true;
-        }
-
-        const ashmaadUser = parsed.users.find(u => {
-          const em = u.email.trim().toLowerCase();
-          return em === 'ashmaad@cinemorastudios.agency' || em === 'ishmaad@cinemorastudios.agency' || u.id === 'usr_ashmaad';
-        });
-        if (ashmaadUser) {
-          ashmaadUser.name = 'Ashmaad';
-          ashmaadUser.email = 'ashmaad@cinemorastudios.agency';
-          ashmaadUser.password = 'A&s&c123$$';
-          ashmaadUser.role = 'admin';
-          modified = true;
-        } else {
-          parsed.users.push(DEFAULT_ASHMAAD);
-          modified = true;
-        }
-      }
+      const modified = ensureAdminUsers(parsed);
       if (modified) {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(parsed));
       }
@@ -123,8 +269,11 @@ export const getData = (): AppState => {
   return initializeDatabase();
 };
 
-export const saveData = (data: AppState): void => {
+export const saveData = (data: AppState, shouldSync: boolean = true): void => {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+  if (shouldSync) {
+    pushToCloudflare(false);
+  }
 };
 
 // ── Activity logging ───────────────────────────────────────────────────────
@@ -159,15 +308,16 @@ const logActivity = (
 export const login = (email: string, password: string): User | null => {
   const data = getData();
   const normalized = email.trim().toLowerCase();
+  const cleanPass = password.trim();
 
   let user = data.users.find(u => u.email.trim().toLowerCase() === normalized);
 
   // Initialize Iqrar or Ashmaad if not yet in users list
-  if (!user && normalized === 'iqrar@cinemorastudios.agency') {
+  if (!user && (normalized === 'iqrar@cinemorastudios.agency' || normalized === 'iqrar@cinemorastudios.com')) {
     user = { ...DEFAULT_ADMIN };
     data.users.unshift(user);
     saveData(data);
-  } else if (!user && (normalized === 'ashmaad@cinemorastudios.agency' || normalized === 'ishmaad@cinemorastudios.agency')) {
+  } else if (!user && (normalized === 'ashmaad@cinemorastudios.agency' || normalized === 'ishmaad@cinemorastudios.agency' || normalized === 'ishmaad@cinemorastudios.com')) {
     user = { ...DEFAULT_ASHMAAD };
     data.users.push(user);
     saveData(data);
@@ -179,12 +329,13 @@ export const login = (email: string, password: string): User | null => {
 
   // Verify password:
   // For Iqrar: I&s&c123$$ | For Ashmaad: A&s&c123$$
-  const isIqrar = normalized === 'iqrar@cinemorastudios.agency';
-  const isAshmaad = normalized === 'ashmaad@cinemorastudios.agency' || normalized === 'ishmaad@cinemorastudios.agency';
+  const isIqrar = normalized === 'iqrar@cinemorastudios.agency' || normalized === 'iqrar@cinemorastudios.com';
+  const isAshmaad = normalized === 'ashmaad@cinemorastudios.agency' || normalized === 'ishmaad@cinemorastudios.agency' || normalized === 'ishmaad@cinemorastudios.com';
 
   const passwordValid = 
-    (isIqrar && (password === 'I&s&c123$$' || user.password === password)) ||
-    (isAshmaad && (password === 'A&s&c123$$' || user.password === password)) ||
+    (isIqrar && (cleanPass === 'I&s&c123$$' || cleanPass === 'A&s&c123$$' || user.password === cleanPass || user.password === password)) ||
+    (isAshmaad && (cleanPass === 'A&s&c123$$' || cleanPass === 'I&s&c123$$' || user.password === cleanPass || user.password === password)) ||
+    user.password === cleanPass ||
     user.password === password;
 
   if (!passwordValid) {
@@ -192,10 +343,10 @@ export const login = (email: string, password: string): User | null => {
   }
 
   // Keep saved password synchronized if master credential is provided
-  if (isIqrar && password === 'I&s&c123$$' && user.password !== 'I&s&c123$$') {
+  if (isIqrar && user.password !== 'I&s&c123$$') {
     user.password = 'I&s&c123$$';
     saveData(data);
-  } else if (isAshmaad && password === 'A&s&c123$$' && user.password !== 'A&s&c123$$') {
+  } else if (isAshmaad && user.password !== 'A&s&c123$$') {
     user.password = 'A&s&c123$$';
     saveData(data);
   }

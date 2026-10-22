@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
 import { InviteMemberModal } from '../InviteMemberModal';
-import { Plus, Save, Info, Mail, Globe, ShieldCheck, Lock } from 'lucide-react';
+import { Plus, Save, Info, Mail, Globe, ShieldCheck, Lock, Cloud, RefreshCw } from 'lucide-react';
 import { UserRole } from '../../types';
 
 export const SettingsView: React.FC = () => {
-  const { project, currentUser, invitations, inviteUser, logout, updateProject, updatePassword } = useApp();
+  const { project, currentUser, invitations, inviteUser, logout, updateProject, updatePassword, syncStatus, syncNow } = useApp();
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
   const [projectName, setProjectName] = useState(project.name);
   const [projectDesc, setProjectDesc] = useState(project.description);
@@ -146,6 +146,54 @@ export const SettingsView: React.FC = () => {
               </div>
             )}
           </div>
+        </div>
+
+        {/* ── Cloudflare D1 Multi-Device Sync ──────────────────────── */}
+        <div className="bg-[#17231B] p-6 rounded-2xl border border-[#304A39] shadow-sm">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-xl bg-[#1B2B21] border border-[#304A39] flex items-center justify-center">
+                <Cloud className="w-4 h-4 text-[#77C98A]" />
+              </div>
+              <div>
+                <h3 className="font-bold text-xs uppercase tracking-wider text-[#E9F5E9]">Cloudflare D1 Multi-Device Sync</h3>
+                <p className="text-[11px] text-[#A7BDAA] mt-0.5">Real-time edge synchronization across laptops, phones, and team editors.</p>
+              </div>
+            </div>
+            <button
+              onClick={() => syncNow()}
+              className="px-3.5 py-2 bg-[#1B2B21] border border-[#304A39] hover:border-[#77C98A] text-[#E9F5E9] rounded-xl transition-colors flex items-center gap-2 text-xs font-medium cursor-pointer"
+            >
+              <RefreshCw className={`w-3.5 h-3.5 text-[#B8F28B] ${syncStatus.status === 'syncing' ? 'animate-spin' : ''}`} />
+              <span>{syncStatus.status === 'syncing' ? 'Syncing…' : 'Sync Now'}</span>
+            </button>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-4">
+            <div className="p-3 bg-[#132018] border border-[#304A39] rounded-xl">
+              <span className="block text-[10px] text-[#A7BDAA] uppercase tracking-wider mb-1">Status</span>
+              <div className="flex items-center gap-2">
+                <span className={`w-2 h-2 rounded-full ${syncStatus.status === 'synced' ? 'bg-[#B8F28B]' : syncStatus.status === 'syncing' ? 'bg-[#B8F28B] animate-ping' : 'bg-rose-400'}`} />
+                <span className="text-xs font-mono font-semibold text-[#E9F5E9] uppercase">{syncStatus.status}</span>
+              </div>
+            </div>
+
+            <div className="p-3 bg-[#132018] border border-[#304A39] rounded-xl">
+              <span className="block text-[10px] text-[#A7BDAA] uppercase tracking-wider mb-1">D1 Database</span>
+              <span className="text-xs font-mono text-[#77C98A]">cinemora-os-d1-staging</span>
+            </div>
+
+            <div className="p-3 bg-[#132018] border border-[#304A39] rounded-xl">
+              <span className="block text-[10px] text-[#A7BDAA] uppercase tracking-wider mb-1">Last Synced</span>
+              <span className="text-xs font-mono text-[#A7BDAA]">
+                {syncStatus.lastSyncedAt ? new Date(syncStatus.lastSyncedAt).toLocaleTimeString() : 'Pending'}
+              </span>
+            </div>
+          </div>
+
+          <p className="text-[11px] text-[#A7BDAA]">
+            All issues, sprints, comments, invitations, and state updates are saved locally with 0ms latency and instantly synchronized via Cloudflare Workers & D1 across all logged-in devices.
+          </p>
         </div>
 
         {/* ── Team Invitations — Admin only ──────────────────────── */}

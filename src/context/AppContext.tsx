@@ -47,6 +47,10 @@ interface AppContextType {
   // Activities
   activities: Activity[];
 
+  // Cloudflare D1 Sync
+  syncStatus: db.SyncStatus;
+  syncNow: () => Promise<void>;
+
   // Utility
   refreshData: () => void;
 }
@@ -56,13 +60,58 @@ const AppContext = createContext<AppContextType | undefined>(undefined);
 export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [appState, setAppState] = useState<AppState>(() => db.initializeDatabase());
+  const [syncStatus, setSyncStatus] = useState<db.SyncStatus>(() => db.getSyncStatus());
 
   useEffect(() => {
     const user = db.getCurrentUser();
     if (user) setCurrentUser(user);
+
+    const unsub = db.subscribeSyncStatus(setSyncStatus);
+
+    // Initial pull from Cloudflare D1
+    db.pullFromCloudflare().then((remoteData) => {
+      if (remoteData) {
+        setAppState(remoteData);
+      }
+    });
+
+    // Window focus refresh for multi-device sync
+    const handleFocus = () => {
+      db.pullFromCloudflare().then((remoteData) => {
+        if (remoteData) {
+          setAppState(remoteData);
+        }
+      });
+    };
+    window.addEventListener('focus', handleFocus);
+
+    // Periodic sync check (every 30 seconds)
+    const interval = setInterval(() => {
+      db.pullFromCloudflare().then((remoteData) => {
+        if (remoteData) {
+          setAppState(remoteData);
+        }
+      });
+    }, 30000);
+
+    return () => {
+      unsub();
+      window.removeEventListener('focus', handleFocus);
+      clearInterval(interval);
+    };
   }, []);
 
   const refreshData = () => setAppState(db.getData());
+
+  const syncNow = async () => {
+    const remoteData = await db.pullFromCloudflare();
+    if (remoteData) {
+      setAppState(remoteData);
+    } else {
+      await db.pushToCloudflare(true);
+      setAppState(db.getData());
+    }
+  };
 
   // ── Auth ────────────────────────────────────────────────────────────────
 
@@ -278,6 +327,8 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         completeSprint,
         invitations: appState.invitations,
         activities: appState.activities ?? [],
+        syncStatus,
+        syncNow,
         refreshData,
       }}
     >

@@ -16,13 +16,13 @@ import {
   X, User, LogOut,
   CheckCircle2, AlertTriangle, Keyboard,
   Bug, ShieldCheck, ChevronRight, ExternalLink,
-  Sparkles
+  Sparkles, Cloud, RefreshCw
 } from 'lucide-react';
 
 type TabType = 'board' | 'backlog' | 'sprints' | 'dashboard' | 'activity' | 'team' | 'settings';
 
 export const ModernDashboard: React.FC = () => {
-  const { currentUser, logout, project, addIssue, issues, activities, users } = useApp();
+  const { currentUser, logout, project, addIssue, issues, activities, users, syncStatus, syncNow } = useApp();
 
   const [activeTab, setActiveTab] = useState<TabType>('board');
   const [showUserMenu, setShowUserMenu] = useState(false);
@@ -287,7 +287,40 @@ export const ModernDashboard: React.FC = () => {
           </div>
 
           {/* Header Actions */}
-          <div className="flex items-center gap-1.5 flex-shrink-0">
+          <div className="flex items-center gap-2 flex-shrink-0">
+            {/* Cloudflare D1 Multi-Device Sync Pill */}
+            <button
+              onClick={() => syncNow()}
+              title={`Cloudflare D1 Multi-Device Sync: ${syncStatus.status.toUpperCase()}${syncStatus.lastSyncedAt ? ` • Last synced: ${new Date(syncStatus.lastSyncedAt).toLocaleTimeString()}` : ''} • Click to sync now`}
+              className={`flex items-center gap-2 px-2.5 py-1.5 rounded-xl border text-xs transition-all cursor-pointer ${
+                syncStatus.status === 'syncing'
+                  ? 'bg-[#1B2B21] border-[#77C98A] text-[#B8F28B]'
+                  : syncStatus.status === 'error'
+                  ? 'bg-rose-950/30 border-rose-800 text-rose-300'
+                  : 'bg-[#132018] border-[#304A39] hover:border-[#77C98A] text-[#E9F5E9]'
+              }`}
+            >
+              {syncStatus.status === 'syncing' ? (
+                <RefreshCw className="w-3.5 h-3.5 text-[#B8F28B] animate-spin" />
+              ) : (
+                <Cloud className="w-3.5 h-3.5 text-[#77C98A]" />
+              )}
+              <span className="text-[11px] font-medium hidden sm:inline">
+                {syncStatus.status === 'syncing'
+                  ? 'Syncing Cloudflare D1…'
+                  : syncStatus.status === 'error'
+                  ? 'Sync Retry'
+                  : 'Cloudflare D1 Synced'}
+              </span>
+              <span className={`w-1.5 h-1.5 rounded-full ${
+                syncStatus.status === 'syncing'
+                  ? 'bg-[#B8F28B] animate-ping'
+                  : syncStatus.status === 'error'
+                  ? 'bg-rose-400'
+                  : 'bg-[#B8F28B]'
+              }`} />
+            </button>
+
             {/* Keyboard shortcuts trigger */}
             <button
               onClick={() => setShowShortcutsModal(true)}
