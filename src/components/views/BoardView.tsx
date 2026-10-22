@@ -13,7 +13,7 @@ import {
 import { IssueCard } from '../IssueCard';
 import { DroppableColumn } from '../DroppableColumn';
 import { IssueDetailModal } from '../IssueDetailModal';
-import { Info, ShieldCheck } from 'lucide-react';
+import { Info, ShieldCheck, Zap } from 'lucide-react';
 
 export const BoardView: React.FC = () => {
   const { issues, sprints, updateIssue, users, currentUser } = useApp();
@@ -89,51 +89,59 @@ export const BoardView: React.FC = () => {
       ).length;
 
   return (
-    <div className="h-full">
-      {/* Sprint label */}
+    <div className="h-full flex flex-col">
+      {/* Sprint label & Permissions Header */}
       {activeSprint ? (
-        <div className="mb-3 flex items-center justify-between flex-wrap gap-2">
-          <p className="text-sm text-gray-600">
-            Active sprint:{' '}
-            <span className="font-semibold text-gray-900">{activeSprint.name}</span>
-          </p>
+        <div className="mb-4 flex items-center justify-between flex-wrap gap-3 bg-[#17231B] border border-[#304A39] p-3.5 rounded-2xl">
+          <div className="flex items-center gap-2.5">
+            <div className="w-2 h-2 rounded-full bg-[#B8F28B] animate-pulse" />
+            <span className="text-xs text-[#A7BDAA]">Active Sprint:</span>
+            <span className="text-xs font-bold text-[#E9F5E9] tracking-wide">{activeSprint.name}</span>
+            {activeSprint.goal && (
+              <span className="text-xs text-[#A7BDAA] hidden md:inline">• {activeSprint.goal}</span>
+            )}
+          </div>
 
-          {/* Permission banner for non-admin members */}
-          {!isAdmin && (
-            <div className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 border border-blue-100 rounded-lg text-xs text-blue-700">
-              <Info className="w-3.5 h-3.5 flex-shrink-0" />
-              You can move{' '}
-              <span className="font-semibold">
-                {draggableCount === 0
-                  ? 'no cards'
-                  : `${draggableCount} card${draggableCount !== 1 ? 's' : ''}`}
-              </span>
-              &nbsp;assigned to you.
-            </div>
-          )}
+          <div className="flex items-center gap-2">
+            {/* Permission banner for non-admin members */}
+            {!isAdmin && (
+              <div className="flex items-center gap-1.5 px-3 py-1 bg-[#1B2B21] border border-[#304A39] rounded-xl text-xs text-[#77C98A]">
+                <Info className="w-3.5 h-3.5 flex-shrink-0" />
+                <span>
+                  Moving{' '}
+                  <strong className="text-[#B8F28B]">
+                    {draggableCount === 0 ? '0' : draggableCount}
+                  </strong>{' '}
+                  assigned tasks
+                </span>
+              </div>
+            )}
 
-          {/* Admin badge */}
-          {isAdmin && (
-            <div className="flex items-center gap-1.5 px-3 py-1.5 bg-purple-50 border border-purple-100 rounded-lg text-xs text-purple-700">
-              <ShieldCheck className="w-3.5 h-3.5 flex-shrink-0" />
-              Admin — full drag access
-            </div>
-          )}
+            {/* Admin badge */}
+            {isAdmin && (
+              <div className="flex items-center gap-1.5 px-3 py-1 bg-[#1B2B21] border border-[#304A39] rounded-xl text-xs text-[#B8F28B] font-medium">
+                <ShieldCheck className="w-3.5 h-3.5 flex-shrink-0 text-[#B8F28B]" />
+                <span>Founder / Admin Mode</span>
+              </div>
+            )}
+          </div>
         </div>
       ) : (
-        <div className="mb-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-          <p className="text-sm text-yellow-800">
-            No active sprint. Go to Backlog to start a sprint.
-          </p>
+        <div className="mb-4 p-4 bg-[#17231B] border border-[#304A39] rounded-2xl flex items-center justify-between">
+          <div className="flex items-center gap-2.5 text-xs text-[#A7BDAA]">
+            <Zap className="w-4 h-4 text-[#77C98A]" />
+            <span>No sprint currently active. Switch to Backlog to launch a planned sprint or work directly on backlog tasks.</span>
+          </div>
         </div>
       )}
 
+      {/* Kanban Board Dnd Columns */}
       <DndContext
         sensors={sensors}
         onDragStart={handleDragStart}
         onDragEnd={handleDragEnd}
       >
-        <div className="flex gap-4 overflow-x-auto pb-4">
+        <div className="flex gap-4 overflow-x-auto pb-6 flex-1 items-start">
           {statuses.map(status => {
             const statusIssues = getIssuesByStatus(status.id);
             return (
@@ -143,7 +151,7 @@ export const BoardView: React.FC = () => {
                 title={status.label}
                 count={statusIssues.length}
               >
-                <div className="space-y-3">
+                <div className="space-y-3 min-h-[100px]">
                   {statusIssues.map(issue => (
                     <IssueCard
                       key={issue.id}
@@ -162,7 +170,7 @@ export const BoardView: React.FC = () => {
         {/* Ghost card shown while dragging */}
         <DragOverlay>
           {activeIssue && (
-            <div className="opacity-80 rotate-1 scale-105">
+            <div className="opacity-90 rotate-2 scale-105 shadow-2xl">
               <IssueCard
                 issue={activeIssue}
                 onClick={() => {}}

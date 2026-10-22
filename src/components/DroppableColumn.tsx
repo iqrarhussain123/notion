@@ -17,15 +17,18 @@ export const DroppableColumn: React.FC<DroppableColumnProps> = ({ id, title, cou
     <div className="flex-shrink-0 w-80">
       <div
         ref={setNodeRef}
-        className={`bg-[#F4F5F7] rounded-lg p-3 min-h-[500px] transition-colors ${
-          isOver ? 'bg-blue-50 ring-2 ring-blue-300' : ''
+        className={`bg-[#17231B] border border-[#304A39] rounded-2xl p-3.5 min-h-[550px] transition-all ${
+          isOver ? 'bg-[#1B2B21] border-[#B8F28B] ring-1 ring-[#B8F28B] shadow-lg' : ''
         }`}
       >
-        <div className="flex items-center justify-between mb-3">
-          <h3 className="text-xs font-semibold text-gray-600 uppercase tracking-wide">
-            {title}
-          </h3>
-          <span className="bg-gray-300 text-gray-700 px-2 py-0.5 rounded-full text-xs font-medium">
+        <div className="flex items-center justify-between mb-3 px-1">
+          <div className="flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-[#77C98A]" />
+            <h3 className="text-xs font-bold text-[#E9F5E9] tracking-wider uppercase font-mono">
+              {title}
+            </h3>
+          </div>
+          <span className="bg-[#1B2B21] border border-[#304A39] text-[#B8F28B] px-2 py-0.5 rounded-full text-xs font-mono font-semibold">
             {count}
           </span>
         </div>

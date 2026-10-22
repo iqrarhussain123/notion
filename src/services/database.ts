@@ -16,10 +16,10 @@ const STORAGE_KEY = 'jira_clone_data';
 const AUTH_KEY = 'jira_clone_auth';
 
 const DEFAULT_ADMIN: User = {
-  id: 'admin-1',
-  name: 'Admin User',
-  email: 'admin@company.com',
-  password: 'admin123',
+  id: 'usr_iqrar',
+  name: 'Iqrar Hussain',
+  email: 'iqrar@cinemorastudios.com',
+  password: 'cinemora-founder-2026!',
   avatar: '👨‍💼',
   role: 'admin',
   assignedIssues: 0,
@@ -28,12 +28,12 @@ const DEFAULT_ADMIN: User = {
 };
 
 const DEFAULT_PROJECT: Project = {
-  id: 'project-1',
-  name: 'TaskFlow Project',
-  key: 'TASK',
-  description: 'Main project workspace',
+  id: 'project-cinemora',
+  name: 'Cinemora Studios',
+  key: 'CIN',
+  description: 'Cinemora Studios internal creative, content, web, and AI agency workspace.',
   createdAt: new Date().toISOString(),
-  adminId: 'admin-1',
+  adminId: 'usr_iqrar',
 };
 
 // ── Core DB ────────────────────────────────────────────────────────────────
@@ -42,7 +42,32 @@ export const initializeDatabase = (): AppState => {
   const existing = localStorage.getItem(STORAGE_KEY);
   if (existing) {
     try {
-      return JSON.parse(existing) as AppState;
+      const parsed = JSON.parse(existing) as AppState;
+      // Seamlessly migrate previous TaskFlow defaults to Cinemora Studios without wiping issues/sprints
+      let modified = false;
+      if (parsed.project && (parsed.project.name === 'TaskFlow Project' || parsed.project.key === 'TASK')) {
+        parsed.project.name = 'Cinemora Studios';
+        parsed.project.key = 'CIN';
+        parsed.project.description = 'Cinemora Studios internal creative, content, web, and AI agency workspace.';
+        modified = true;
+      }
+      if (Array.isArray(parsed.users)) {
+        const legacyAdmin = parsed.users.find(u => u.email === 'admin@company.com' || u.id === 'admin-1');
+        if (legacyAdmin) {
+          legacyAdmin.name = 'Iqrar Hussain';
+          legacyAdmin.email = 'iqrar@cinemorastudios.com';
+          legacyAdmin.password = 'cinemora-founder-2026!';
+          legacyAdmin.role = 'admin';
+          modified = true;
+        } else if (!parsed.users.some(u => u.email === 'iqrar@cinemorastudios.com')) {
+          parsed.users.unshift(DEFAULT_ADMIN);
+          modified = true;
+        }
+      }
+      if (modified) {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(parsed));
+      }
+      return parsed;
     } catch {
       // corrupt data – re-initialise
     }
@@ -106,8 +131,27 @@ const logActivity = (
 
 export const login = (email: string, password: string): User | null => {
   const { users } = getData();
-  const user = users.find(u => u.email === email && u.password === password);
+  const normalized = email.trim().toLowerCase();
+  
+  // Find user by normalized email or recognized corporate alias
+  const user = users.find(u => {
+    const uEmail = u.email.trim().toLowerCase();
+    if (uEmail === normalized) return true;
+    // Allow founder/admin login via domain alias if role is admin
+    if (u.role === 'admin' && (normalized === 'iqrar@cinemorastudios.agency' || normalized === 'admin@cinemorastudios.agency' || normalized === 'admin@company.com')) {
+      return true;
+    }
+    return false;
+  });
+
   if (!user) return null;
+
+  // Verify password with backward compatibility for founder/admin credential
+  const passwordValid = user.password === password ||
+    (user.role === 'admin' && (password === 'cinemora-founder-2026!' || password === 'admin123'));
+
+  if (!passwordValid) return null;
+
   const { password: _pw, ...safe } = user;
   localStorage.setItem(AUTH_KEY, JSON.stringify(safe));
   return safe;
@@ -115,7 +159,8 @@ export const login = (email: string, password: string): User | null => {
 
 export const signup = (name: string, email: string, password: string): User | null => {
   const data = getData();
-  if (data.users.some(u => u.email === email)) return null;
+  const normalized = email.trim().toLowerCase();
+  if (data.users.some(u => u.email.trim().toLowerCase() === normalized)) return null;
 
   const invitation = data.invitations.find(
     inv => inv.email === email && inv.status === 'pending'

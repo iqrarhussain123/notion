@@ -8,6 +8,10 @@ import {
   Bug,
   Target,
   FileText,
+  Activity,
+  Layers,
+  Clock,
+  Sparkles,
 } from 'lucide-react';
 
 export const DashboardView: React.FC = () => {
@@ -41,123 +45,153 @@ export const DashboardView: React.FC = () => {
     .slice(0, 8);
 
   const typeIcons: Record<string, React.ReactNode> = {
-    story: <BookOpen className="w-4 h-4 text-blue-600" />,
-    task: <CheckSquare className="w-4 h-4 text-green-600" />,
-    bug: <Bug className="w-4 h-4 text-red-600" />,
-    epic: <Target className="w-4 h-4 text-purple-600" />,
+    story: <BookOpen className="w-3.5 h-3.5 text-[#77C98A]" />,
+    task: <CheckSquare className="w-3.5 h-3.5 text-[#B8F28B]" />,
+    bug: <Bug className="w-3.5 h-3.5 text-rose-400" />,
+    epic: <Target className="w-3.5 h-3.5 text-purple-400" />,
   };
 
   const statCards = [
-    { label: 'Backlog', count: byStatus.backlog, color: 'text-gray-600', bg: 'bg-gray-50' },
-    { label: 'To Do', count: byStatus.todo, color: 'text-blue-600', bg: 'bg-blue-50' },
-    { label: 'In Progress', count: byStatus['in-progress'], color: 'text-yellow-600', bg: 'bg-yellow-50' },
-    { label: 'In Review', count: byStatus['in-review'], color: 'text-purple-600', bg: 'bg-purple-50' },
-    { label: 'Done', count: byStatus.done, color: 'text-green-600', bg: 'bg-green-50' },
-    { label: 'Total Issues', count: issues.length, color: 'text-[#0052CC]', bg: 'bg-blue-50' },
+    { label: 'Unassigned Backlog', count: byStatus.backlog, accent: 'text-[#A7BDAA]' },
+    { label: 'To Do',              count: byStatus.todo,    accent: 'text-[#77C98A]' },
+    { label: 'In Progress',        count: byStatus['in-progress'], accent: 'text-amber-400' },
+    { label: 'In Review',          count: byStatus['in-review'],   accent: 'text-blue-400' },
+    { label: 'Completed Deliverables', count: byStatus.done,   accent: 'text-[#B8F28B]' },
+    { label: 'Total Tracked Issues', count: issues.length,   accent: 'text-[#E9F5E9]' },
   ];
 
   return (
-    <div>
-      <h2 className="text-2xl font-semibold text-[#172B4D] mb-6">Dashboard</h2>
+    <div className="space-y-6">
+      <div>
+        <h2 className="text-xl font-bold text-[#E9F5E9]">Agency Operations Dashboard</h2>
+        <p className="text-xs text-[#A7BDAA] mt-0.5">Real-time sprint velocity, issue distribution, and team capacity analytics.</p>
+      </div>
 
       {/* Status Cards */}
-      <div className="grid grid-cols-3 gap-4 mb-6">
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
         {statCards.map(card => (
-          <div key={card.label} className={`${card.bg} p-5 rounded-lg border border-gray-200`}>
-            <div className={`text-3xl font-bold ${card.color}`}>{card.count}</div>
-            <div className="text-sm text-gray-600 mt-1">{card.label}</div>
+          <div key={card.label} className="bg-[#17231B] border border-[#304A39] p-4 rounded-2xl">
+            <div className={`text-2xl font-bold font-mono ${card.accent}`}>{card.count}</div>
+            <div className="text-[11px] text-[#A7BDAA] font-medium mt-1 truncate">{card.label}</div>
           </div>
         ))}
       </div>
 
-      <div className="grid grid-cols-2 gap-6 mb-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Issue Types Breakdown */}
-        <div className="bg-white p-5 rounded-lg border border-gray-200">
-          <h3 className="font-semibold text-gray-900 mb-4">By Type</h3>
-          <div className="space-y-3">
-            {Object.entries(byType).map(([type, count]) => (
-              <div key={type} className="flex items-center justify-between">
-                <div className="flex items-center gap-2 text-sm">
-                  <span className="flex items-center">
-                    {typeIcons[type] ?? <FileText className="w-4 h-4 text-gray-500" />}
-                  </span>
-                  <span className="capitalize text-gray-700">{type}</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-24 h-2 bg-gray-100 rounded-full overflow-hidden">
+        <div className="bg-[#17231B] border border-[#304A39] p-5 rounded-2xl shadow-sm">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="font-bold text-xs uppercase tracking-wider text-[#E9F5E9] flex items-center gap-2">
+              <Layers className="w-4 h-4 text-[#77C98A]" /> Issue Types Breakdown
+            </h3>
+            <span className="text-[10px] text-[#A7BDAA] font-mono">{issues.length} total</span>
+          </div>
+
+          <div className="space-y-3.5">
+            {Object.entries(byType).map(([type, count]) => {
+              const pct = issues.length > 0 ? Math.round((count / issues.length) * 100) : 0;
+              return (
+                <div key={type} className="space-y-1.5">
+                  <div className="flex items-center justify-between text-xs">
+                    <div className="flex items-center gap-2">
+                      <span className="flex items-center">
+                        {typeIcons[type] ?? <FileText className="w-3.5 h-3.5 text-[#A7BDAA]" />}
+                      </span>
+                      <span className="capitalize text-[#E9F5E9] font-medium">{type}</span>
+                    </div>
+                    <span className="text-[11px] font-mono text-[#A7BDAA]">
+                      {count} <span className="text-[#304A39]">({pct}%)</span>
+                    </span>
+                  </div>
+                  <div className="w-full h-2 bg-[#132018] rounded-full overflow-hidden border border-[#304A39]/50">
                     <div
-                      className="h-full bg-[#0052CC] rounded-full"
-                      style={{ width: issues.length > 0 ? `${(count / issues.length) * 100}%` : '0%' }}
+                      className="h-full bg-gradient-to-r from-[#77C98A] to-[#B8F28B] rounded-full transition-all duration-500"
+                      style={{ width: `${pct}%` }}
                     />
                   </div>
-                  <span className="text-sm font-medium text-gray-600 w-6 text-right">{count}</span>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
 
-        {/* Active Sprint */}
-        <div className="bg-white p-5 rounded-lg border border-gray-200">
-          <h3 className="font-semibold text-gray-900 mb-4">Active Sprint</h3>
+        {/* Active Sprint Progress Widget */}
+        <div className="bg-[#17231B] border border-[#304A39] p-5 rounded-2xl shadow-sm">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="font-bold text-xs uppercase tracking-wider text-[#E9F5E9] flex items-center gap-2">
+              <Clock className="w-4 h-4 text-[#B8F28B]" /> Active Sprint Status
+            </h3>
+            {activeSprint && (
+              <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#B8F28B]/10 text-[#B8F28B] font-mono border border-[#304A39]">
+                Active
+              </span>
+            )}
+          </div>
+
           {activeSprint ? (
-            <div className="space-y-3">
+            <div className="space-y-4">
               <div>
-                <div className="font-medium text-gray-800">{activeSprint.name}</div>
+                <div className="font-bold text-sm text-[#E9F5E9]">{activeSprint.name}</div>
                 {activeSprint.goal && (
-                  <div className="text-xs text-gray-500 mt-0.5">{activeSprint.goal}</div>
+                  <div className="text-xs text-[#A7BDAA] mt-0.5">{activeSprint.goal}</div>
                 )}
               </div>
+
               <div>
-                <div className="flex justify-between text-xs text-gray-500 mb-1">
-                  <span>{activeSprintDone} / {activeSprintIssues.length} issues done</span>
-                  <span>{activeSprintProgress}%</span>
+                <div className="flex justify-between text-xs mb-1.5">
+                  <span className="text-[#A7BDAA]">{activeSprintDone} of {activeSprintIssues.length} deliverables completed</span>
+                  <span className="font-mono font-bold text-[#B8F28B]">{activeSprintProgress}%</span>
                 </div>
-                <div className="h-3 bg-gray-100 rounded-full overflow-hidden">
+                <div className="h-2.5 bg-[#132018] rounded-full overflow-hidden border border-[#304A39]">
                   <div
-                    className="h-full bg-green-500 rounded-full transition-all"
+                    className="h-full bg-[#B8F28B] rounded-full transition-all duration-500 shadow-sm"
                     style={{ width: `${activeSprintProgress}%` }}
                   />
                 </div>
               </div>
-              <div className="grid grid-cols-2 gap-2 text-center pt-1">
+
+              <div className="grid grid-cols-4 gap-2 text-center pt-2">
                 {[
-                  { label: 'To Do', count: activeSprintIssues.filter(i => i.status === 'todo').length },
-                  { label: 'In Progress', count: activeSprintIssues.filter(i => i.status === 'in-progress').length },
-                  { label: 'In Review', count: activeSprintIssues.filter(i => i.status === 'in-review').length },
-                  { label: 'Done', count: activeSprintDone },
+                  { label: 'To Do', count: activeSprintIssues.filter(i => i.status === 'todo').length, color: 'text-[#77C98A]' },
+                  { label: 'Active', count: activeSprintIssues.filter(i => i.status === 'in-progress').length, color: 'text-amber-400' },
+                  { label: 'Review', count: activeSprintIssues.filter(i => i.status === 'in-review').length, color: 'text-blue-400' },
+                  { label: 'Done', count: activeSprintDone, color: 'text-[#B8F28B]' },
                 ].map(s => (
-                  <div key={s.label} className="bg-gray-50 rounded-lg p-2">
-                    <div className="text-lg font-bold text-gray-800">{s.count}</div>
-                    <div className="text-xs text-gray-500">{s.label}</div>
+                  <div key={s.label} className="bg-[#132018] border border-[#304A39] rounded-xl p-2.5">
+                    <div className={`text-base font-bold font-mono ${s.color}`}>{s.count}</div>
+                    <div className="text-[10px] text-[#A7BDAA] mt-0.5">{s.label}</div>
                   </div>
                 ))}
               </div>
             </div>
           ) : (
-            <div className="text-center py-8">
-              <div className="text-gray-400 text-sm">No active sprint</div>
-              <div className="text-gray-400 text-xs mt-1">Start a sprint from Backlog view</div>
+            <div className="text-center py-10">
+              <div className="text-xs text-[#A7BDAA]">No sprint currently active</div>
+              <div className="text-[11px] text-[#77C98A] mt-1">Start or plan sprints from the Backlog tab</div>
             </div>
           )}
         </div>
       </div>
 
-      {/* Team Stats */}
-      <div className="bg-white p-5 rounded-lg border border-gray-200 mb-6">
-        <h3 className="font-semibold text-gray-900 mb-4">Team Performance</h3>
-        <div className="grid grid-cols-2 gap-3">
+      {/* Team Capacity / Performance */}
+      <div className="bg-[#17231B] border border-[#304A39] p-5 rounded-2xl shadow-sm">
+        <h3 className="font-bold text-xs uppercase tracking-wider text-[#E9F5E9] mb-4 flex items-center gap-2">
+          <Sparkles className="w-4 h-4 text-[#77C98A]" /> Team Load & Production Capacity
+        </h3>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
           {users.map(user => {
             const assigned = issues.filter(i => i.assigneeId === user.id).length;
             const completed = issues.filter(i => i.assigneeId === user.id && i.status === 'done').length;
             return (
-              <div key={user.id} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-                <div className="w-9 h-9 rounded-full bg-gradient-to-br from-purple-400 to-pink-400 flex items-center justify-center text-white text-xs font-medium flex-shrink-0">
+              <div key={user.id} className="flex items-center gap-3 p-3 bg-[#132018] border border-[#304A39] rounded-xl">
+                <div className="w-8 h-8 rounded-lg bg-[#1B2B21] border border-[#304A39] flex items-center justify-center text-[#B8F28B] text-xs font-bold font-mono flex-shrink-0">
                   {user.name.split(' ').map(n => n[0]).join('')}
                 </div>
                 <div className="min-w-0 flex-1">
-                  <div className="text-sm font-medium text-gray-800 truncate">{user.name}</div>
-                  <div className="text-xs text-gray-500">{assigned} assigned · {completed} done</div>
+                  <div className="text-xs font-semibold text-[#E9F5E9] truncate">{user.name}</div>
+                  <div className="text-[10px] text-[#A7BDAA] font-mono mt-0.5">
+                    <span className="text-[#B8F28B]">{assigned}</span> assigned • <span className="text-[#77C98A]">{completed}</span> done
+                  </div>
                 </div>
               </div>
             );
@@ -166,35 +200,39 @@ export const DashboardView: React.FC = () => {
       </div>
 
       {/* Recently Updated Issues */}
-      <div className="bg-white rounded-lg border border-gray-200">
-        <div className="p-4 border-b border-gray-100">
-          <h3 className="font-semibold text-gray-900">Recently Updated Issues</h3>
+      <div className="bg-[#17231B] border border-[#304A39] rounded-2xl overflow-hidden shadow-sm">
+        <div className="p-4 border-b border-[#304A39] flex items-center justify-between">
+          <h3 className="font-bold text-xs uppercase tracking-wider text-[#E9F5E9] flex items-center gap-2">
+            <Activity className="w-4 h-4 text-[#B8F28B]" /> Recently Modified Issues
+          </h3>
+          <span className="text-[10px] text-[#A7BDAA]">Latest activity</span>
         </div>
         {recentIssues.length === 0 ? (
-          <p className="text-sm text-gray-400 text-center py-8">No issues yet.</p>
+          <p className="text-xs text-[#A7BDAA] text-center py-8">No issues logged yet.</p>
         ) : (
-          <div className="divide-y divide-gray-50">
+          <div className="divide-y divide-[#304A39]/40 bg-[#132018]">
             {recentIssues.map(issue => (
               <div
                 key={issue.id}
                 onClick={() => setSelectedIssue(issue)}
-                className="px-4 py-2.5 hover:bg-gray-50 cursor-pointer flex items-center gap-3 group"
+                className="px-4 py-3 hover:bg-[#1B2B21] cursor-pointer flex items-center gap-3 group transition-colors"
               >
                 <span className="flex items-center flex-shrink-0">
                   {typeIcons[issue.type] ?? (
-                    <FileText className="w-4 h-4 text-gray-500" />
+                    <FileText className="w-3.5 h-3.5 text-[#A7BDAA]" />
                   )}
                 </span>
-                <span className="text-xs text-gray-400 font-medium w-20 flex-shrink-0">{issue.key}</span>
-                <span className="text-sm text-gray-800 flex-1 truncate group-hover:text-[#0052CC]">{issue.title}</span>
-                <span className={`text-xs px-2 py-0.5 rounded-full flex-shrink-0 ${issue.status === 'done' ? 'bg-green-100 text-green-700'
-                    : issue.status === 'in-progress' ? 'bg-blue-100 text-blue-700'
-                      : issue.status === 'in-review' ? 'bg-purple-100 text-purple-700'
-                        : 'bg-gray-100 text-gray-600'
-                  }`}>
+                <span className="text-xs font-mono font-semibold text-[#B8F28B] w-20 flex-shrink-0">{issue.key}</span>
+                <span className="text-xs text-[#E9F5E9] flex-1 truncate group-hover:text-[#B8F28B]">{issue.title}</span>
+                <span className={`text-[10px] px-2 py-0.5 rounded-full flex-shrink-0 font-medium ${
+                  issue.status === 'done' ? 'bg-[#B8F28B]/10 text-[#B8F28B] border border-[#304A39]'
+                  : issue.status === 'in-progress' ? 'bg-[#77C98A]/10 text-[#77C98A] border border-[#304A39]'
+                  : issue.status === 'in-review' ? 'bg-blue-900/20 text-blue-300 border border-[#304A39]'
+                  : 'bg-[#17231B] text-[#A7BDAA] border border-[#304A39]'
+                }`}>
                   {issue.status}
                 </span>
-                <span className="text-xs text-gray-400 flex-shrink-0 hidden sm:block">
+                <span className="text-[10px] text-[#A7BDAA] font-mono flex-shrink-0 hidden sm:block">
                   {new Date(issue.updatedAt).toLocaleDateString()}
                 </span>
               </div>

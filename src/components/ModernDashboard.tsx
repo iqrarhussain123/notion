@@ -13,9 +13,10 @@ import { Issue } from '../types';
 import {
   Bell, HelpCircle, Search, Plus, Settings, BarChart3,
   Users, Calendar, List, LayoutDashboard, Activity,
-  X, User, LogOut, Moon, Sun, Kanban,
-  CheckCircle2, Info, AlertTriangle, Keyboard,
-  Bug, ShieldCheck, ChevronRight,
+  X, User, LogOut,
+  CheckCircle2, AlertTriangle, Keyboard,
+  Bug, ShieldCheck, ChevronRight, ExternalLink,
+  Sparkles
 } from 'lucide-react';
 
 type TabType = 'board' | 'backlog' | 'sprints' | 'dashboard' | 'activity' | 'team' | 'settings';
@@ -25,7 +26,6 @@ export const ModernDashboard: React.FC = () => {
 
   const [activeTab, setActiveTab] = useState<TabType>('board');
   const [showUserMenu, setShowUserMenu] = useState(false);
-  const [showCreateMenu, setShowCreateMenu] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
   const [showHelpMenu, setShowHelpMenu] = useState(false);
   const [isCreateIssueOpen, setIsCreateIssueOpen] = useState(false);
@@ -43,13 +43,13 @@ export const ModernDashboard: React.FC = () => {
   const searchRef = useRef<HTMLInputElement>(null);
 
   const tabs = [
-    { id: 'board' as TabType,      label: 'Board',     icon: LayoutDashboard },
-    { id: 'backlog' as TabType,    label: 'Backlog',   icon: List },
-    { id: 'sprints' as TabType,    label: 'Sprints',   icon: Calendar },
-    { id: 'dashboard' as TabType,  label: 'Dashboard', icon: BarChart3 },
-    { id: 'activity' as TabType,   label: 'Activity',  icon: Activity },
-    { id: 'team' as TabType,       label: 'Team',      icon: Users },
-    { id: 'settings' as TabType,   label: 'Settings',  icon: Settings },
+    { id: 'board' as TabType,      label: 'Board',     icon: LayoutDashboard, badge: issues.filter(i => i.status !== 'done').length },
+    { id: 'backlog' as TabType,    label: 'Backlog',   icon: List,            badge: issues.filter(i => !i.sprintId).length },
+    { id: 'sprints' as TabType,    label: 'Sprints',   icon: Calendar,        badge: null },
+    { id: 'dashboard' as TabType,  label: 'Metrics',   icon: BarChart3,       badge: null },
+    { id: 'activity' as TabType,   label: 'Activity',  icon: Activity,        badge: null },
+    { id: 'team' as TabType,       label: 'Team',      icon: Users,           badge: users.length },
+    { id: 'settings' as TabType,   label: 'Settings',  icon: Settings,        badge: null },
   ];
 
   const renderView = () => {
@@ -137,7 +137,6 @@ export const ModernDashboard: React.FC = () => {
 
   const closeAllMenus = () => {
     setShowUserMenu(false);
-    setShowCreateMenu(false);
     setShowNotifications(false);
     setShowHelpMenu(false);
   };
@@ -150,233 +149,47 @@ export const ModernDashboard: React.FC = () => {
   };
 
   return (
-    <div className="h-screen flex flex-col bg-[#F4F5F7] overflow-hidden">
+    <div className="h-screen flex bg-[#101914] text-[#E9F5E9] overflow-hidden select-none">
 
-      {/* ── TOP NAVIGATION BAR ─────────────────────────────────────────── */}
-      <header className="bg-white border-b border-gray-200 h-14 flex items-center px-4 gap-4 flex-shrink-0 z-50">
-
-        {/* Logo — Kanban icon */}
-        <div className="flex items-center gap-2 flex-shrink-0">
-          <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-blue-700 rounded-lg flex items-center justify-center text-white shadow-sm">
-            <Kanban style={{ width: 18, height: 18 }} />
+      {/* ── LEFT SIDEBAR NAVIGATION ───────────────────────────────────── */}
+      <aside className="w-64 bg-[#17231B] border-r border-[#304A39] flex flex-col flex-shrink-0 z-40 relative">
+        
+        {/* Brand header */}
+        <div className="p-4 border-b border-[#304A39] flex items-center gap-3">
+          <div className="w-9 h-9 rounded-xl bg-[#1B2B21] border border-[#304A39] flex items-center justify-center flex-shrink-0 relative">
+            <div className="w-5 h-5 rounded-md bg-gradient-to-br from-[#B8F28B] to-[#77C98A] flex items-center justify-center text-[#101914] font-extrabold text-[10px]">
+              CS
+            </div>
+            <span className="absolute -bottom-0.5 -right-0.5 w-2 h-2 rounded-full bg-[#B8F28B] ring-2 ring-[#17231B]" />
           </div>
-          <span className="font-bold text-gray-800 hidden sm:block tracking-tight">SprintBoard</span>
+          <div className="min-w-0 flex-1">
+            <div className="flex items-center gap-1.5">
+              <span className="font-bold text-sm tracking-tight text-[#E9F5E9] truncate">Cinemora Studios</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <span className="text-[10px] font-semibold uppercase tracking-wider text-[#77C98A]">Agency Workspace</span>
+            </div>
+          </div>
         </div>
 
-        {/* Search — functional button that opens overlay */}
-        <div className="flex-1 max-w-md">
+        {/* Create Issue Action */}
+        <div className="p-3">
           <button
-            onClick={openSearch}
-            className="w-full flex items-center gap-2 pl-3 pr-4 py-1.5 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-400 hover:bg-gray-100 hover:border-gray-300 transition-all text-left"
+            onClick={() => setIsCreateIssueOpen(true)}
+            className="w-full py-2 px-3 bg-[#B8F28B] hover:bg-[#77C98A] text-[#101914] font-semibold text-xs rounded-xl flex items-center justify-center gap-2 transition-all shadow-sm cursor-pointer"
           >
-            <Search className="w-4 h-4 flex-shrink-0" />
-            <span className="flex-1">Search issues…</span>
-            <kbd className="hidden sm:inline-flex items-center px-1.5 py-0.5 bg-white border border-gray-200 rounded text-[10px] text-gray-400 font-mono">
-              ⌘K
-            </kbd>
+            <Plus className="w-4 h-4 stroke-[2.5]" />
+            <span>New Issue / Task</span>
+            <kbd className="ml-auto text-[10px] px-1.5 py-0.5 rounded bg-[#101914]/15 font-mono">C</kbd>
           </button>
         </div>
 
-        {/* Right side actions */}
-        <div className="flex items-center gap-1 flex-shrink-0 ml-auto">
-
-          {/* Create */}
-          <div className="relative mr-2">
-            <button
-              onClick={() => { closeAllMenus(); setShowCreateMenu(v => !v); }}
-              className="px-4 py-1.5 bg-[#0052CC] hover:bg-[#0065FF] text-white rounded-lg text-sm font-medium flex items-center gap-2 transition-colors"
-            >
-              <Plus className="w-4 h-4" /> Create
-            </button>
-            {showCreateMenu && (
-              <>
-                <div className="fixed inset-0 z-40" onClick={() => setShowCreateMenu(false)} />
-                <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-50">
-                  <button
-                    onClick={() => { setIsCreateIssueOpen(true); setShowCreateMenu(false); }}
-                    className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"
-                  >
-                    <Plus className="w-4 h-4 text-gray-400" /> Create Issue
-                  </button>
-                  <button
-                    onClick={() => { setActiveTab('backlog'); setShowCreateMenu(false); }}
-                    className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"
-                  >
-                    <Calendar className="w-4 h-4 text-gray-400" /> Create Sprint
-                  </button>
-                </div>
-              </>
-            )}
+        {/* Navigation items */}
+        <div className="flex-1 overflow-y-auto px-3 py-2 space-y-1">
+          <div className="px-3 py-1.5 text-[10px] font-semibold uppercase tracking-wider text-[#A7BDAA]/70">
+            Workspace
           </div>
 
-          {/* Notifications */}
-          <div className="relative">
-            <button
-              onClick={() => { closeAllMenus(); setShowNotifications(v => !v); }}
-              className="p-2 hover:bg-gray-100 rounded-lg transition-colors relative"
-            >
-              <Bell className="w-5 h-5 text-gray-600" />
-              {unreadCount > 0 && (
-                <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
-                  {unreadCount > 9 ? '9+' : unreadCount}
-                </span>
-              )}
-            </button>
-            {showNotifications && (
-              <>
-                <div className="fixed inset-0 z-40" onClick={() => setShowNotifications(false)} />
-                <div className="absolute right-0 top-full mt-2 w-80 bg-white rounded-lg shadow-xl border border-gray-200 z-50 overflow-hidden">
-                  <div className="px-4 py-3 border-b border-gray-100 flex items-center justify-between">
-                    <h3 className="font-semibold text-gray-900 text-sm">Notifications</h3>
-                    <span className="text-xs text-gray-400">{recentActivities.length} recent</span>
-                  </div>
-                  <div className="max-h-80 overflow-y-auto">
-                    {recentActivities.length === 0 ? (
-                      <p className="px-4 py-8 text-center text-sm text-gray-400">No recent activity</p>
-                    ) : recentActivities.map(act => {
-                      const actUser = users.find(u => u.id === act.userId);
-                      return (
-                        <div key={act.id} className="px-4 py-3 hover:bg-gray-50 border-b border-gray-50 last:border-0">
-                          <div className="flex items-start gap-2">
-                            <div className="w-6 h-6 rounded-full bg-gradient-to-br from-purple-400 to-pink-400 flex items-center justify-center text-white text-xs font-medium flex-shrink-0 mt-0.5">
-                              {actUser?.name.split(' ').map(n => n[0]).join('') ?? '?'}
-                            </div>
-                            <div className="flex-1 min-w-0">
-                              <p className="text-xs text-gray-700 leading-relaxed">
-                                <span className="font-medium">{actUser?.name ?? 'Someone'}</span>{' '}{act.details}
-                              </p>
-                              <p className="text-xs text-gray-400 mt-0.5">
-                                {new Date(act.createdAt).toLocaleString()}
-                              </p>
-                            </div>
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                  <div className="px-4 py-2 border-t border-gray-100">
-                    <button
-                      onClick={() => { setActiveTab('activity'); setShowNotifications(false); }}
-                      className="text-xs text-[#0052CC] hover:underline"
-                    >
-                      View all activity →
-                    </button>
-                  </div>
-                </div>
-              </>
-            )}
-          </div>
-
-          {/* Help */}
-          <div className="relative">
-            <button
-              onClick={() => { closeAllMenus(); setShowHelpMenu(v => !v); }}
-              className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-            >
-              <HelpCircle className="w-5 h-5 text-gray-600" />
-            </button>
-            {showHelpMenu && (
-              <>
-                <div className="fixed inset-0 z-40" onClick={() => setShowHelpMenu(false)} />
-                <div className="absolute right-0 top-full mt-2 w-56 bg-white rounded-lg shadow-xl border border-gray-200 py-2 z-50">
-                  <div className="px-4 py-2 border-b border-gray-100 mb-1">
-                    <p className="text-xs font-semibold text-gray-500 uppercase">Help & Resources</p>
-                  </div>
-                  <button
-                    onClick={() => { setActiveTab('dashboard'); setShowHelpMenu(false); }}
-                    className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-3"
-                  >
-                    <Info className="w-4 h-4 text-gray-400" /> Getting Started
-                  </button>
-                  <button
-                    onClick={() => { setShowShortcutsModal(true); setShowHelpMenu(false); }}
-                    className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-3"
-                  >
-                    <Keyboard className="w-4 h-4 text-gray-400" /> Keyboard Shortcuts
-                  </button>
-                  <button
-                    onClick={() => { setShowBugModal(true); setShowHelpMenu(false); }}
-                    className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-3"
-                  >
-                    <Bug className="w-4 h-4 text-gray-400" /> Report a Bug
-                  </button>
-                </div>
-              </>
-            )}
-          </div>
-
-          {/* User Avatar */}
-          <div className="relative ml-1">
-            <button
-              onClick={() => { closeAllMenus(); setShowUserMenu(v => !v); }}
-              className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white text-sm font-medium hover:ring-2 hover:ring-blue-500 transition-all"
-              title={currentUser?.name}
-            >
-              {getInitials(currentUser?.name || 'User')}
-            </button>
-            {showUserMenu && (
-              <>
-                <div className="fixed inset-0 z-40" onClick={() => setShowUserMenu(false)} />
-                <div className="absolute right-0 top-full mt-2 w-64 bg-white rounded-lg shadow-xl border border-gray-200 py-2 z-50">
-                  <div className="px-4 py-3 border-b border-gray-100">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white font-medium flex-shrink-0">
-                        {getInitials(currentUser?.name || 'User')}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="font-semibold text-[#172B4D] truncate">{currentUser?.name}</div>
-                        <div className="text-xs text-gray-500 truncate">{currentUser?.email}</div>
-                        <div className="text-xs text-gray-400 capitalize">{currentUser?.role}</div>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="py-1">
-                    <button
-                      onClick={() => { setShowProfileModal(true); setShowUserMenu(false); }}
-                      className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-3"
-                    >
-                      <User className="w-4 h-4 text-gray-400" /> Profile
-                    </button>
-                    <button
-                      onClick={() => { setActiveTab('settings'); setShowUserMenu(false); }}
-                      className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-3"
-                    >
-                      <Settings className="w-4 h-4 text-gray-400" /> Account settings
-                    </button>
-                    <button
-                      onClick={() => { setShowThemePanel(true); setShowUserMenu(false); }}
-                      className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-3"
-                    >
-                      <Sun className="w-4 h-4 text-gray-400" /> Theme
-                    </button>
-                  </div>
-                  <div className="border-t border-gray-100 py-1">
-                    <button
-                      onClick={() => { logout(); setShowUserMenu(false); }}
-                      className="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50 flex items-center gap-3"
-                    >
-                      <LogOut className="w-4 h-4" /> Log out
-                    </button>
-                  </div>
-                </div>
-              </>
-            )}
-          </div>
-        </div>
-      </header>
-
-      {/* ── PROJECT HEADER + TABS ───────────────────────────────────────── */}
-      <div className="bg-white border-b border-gray-200 px-6 flex-shrink-0">
-        <div className="flex items-center gap-3 pt-4 pb-2">
-          <div className="w-8 h-8 bg-blue-50 border border-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
-            <span className="text-[#0052CC] font-bold text-xs">{project.key}</span>
-          </div>
-          <div>
-            <div className="text-xs text-gray-400">Projects / {project.name}</div>
-            <h1 className="text-xl font-bold text-[#172B4D] leading-tight">{project.name}</h1>
-          </div>
-        </div>
-        <nav className="flex gap-1 overflow-x-auto">
           {tabs.map(tab => {
             const Icon = tab.icon;
             const isActive = activeTab === tab.id;
@@ -384,26 +197,262 @@ export const ModernDashboard: React.FC = () => {
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center gap-2 px-3 py-3 border-b-2 transition-colors whitespace-nowrap text-sm ${
+                className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-medium transition-all ${
                   isActive
-                    ? 'border-[#0052CC] text-[#0052CC] font-medium'
-                    : 'border-transparent text-gray-600 hover:text-gray-900 hover:border-gray-300'
+                    ? 'bg-[#1B2B21] text-[#B8F28B] border border-[#304A39] shadow-sm'
+                    : 'text-[#A7BDAA] hover:text-[#E9F5E9] hover:bg-[#1B2B21]/60'
                 }`}
               >
-                <Icon className="w-4 h-4" />
-                {tab.label}
+                <Icon className={`w-4 h-4 flex-shrink-0 ${isActive ? 'text-[#B8F28B]' : 'text-[#A7BDAA]'}`} />
+                <span className="flex-1 text-left">{tab.label}</span>
+                {tab.badge !== null && tab.badge > 0 && (
+                  <span className={`text-[10px] px-1.5 py-0.2 rounded-full font-mono ${
+                    isActive ? 'bg-[#B8F28B]/20 text-[#B8F28B]' : 'bg-[#132018] text-[#A7BDAA]'
+                  }`}>
+                    {tab.badge}
+                  </span>
+                )}
               </button>
             );
           })}
-        </nav>
+
+          <div className="pt-4 px-3 py-1.5 text-[10px] font-semibold uppercase tracking-wider text-[#A7BDAA]/70">
+            Official Domain
+          </div>
+          <a
+            href="https://www.cinemorastudios.agency"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs text-[#A7BDAA] hover:text-[#B8F28B] hover:bg-[#1B2B21]/60 transition-colors"
+          >
+            <ExternalLink className="w-3.5 h-3.5 text-[#77C98A]" />
+            <span className="truncate">cinemorastudios.agency</span>
+          </a>
+        </div>
+
+        {/* Sidebar Footer with current user */}
+        <div className="p-3 border-t border-[#304A39]">
+          <div className="p-2 rounded-xl bg-[#132018] border border-[#304A39] flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#77C98A] to-[#304A39] flex items-center justify-center text-[#E9F5E9] text-xs font-bold flex-shrink-0">
+              {getInitials(currentUser?.name || 'User')}
+            </div>
+            <div className="min-w-0 flex-1">
+              <div className="text-xs font-semibold text-[#E9F5E9] truncate">{currentUser?.name}</div>
+              <div className="text-[10px] text-[#77C98A] capitalize flex items-center gap-1">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#B8F28B]" />
+                {currentUser?.role === 'admin' ? 'Founder / Admin' : currentUser?.role}
+              </div>
+            </div>
+            <button
+              onClick={() => logout()}
+              title="Sign Out"
+              className="p-1 text-[#A7BDAA] hover:text-red-400 hover:bg-[#1B2B21] rounded-lg transition-colors cursor-pointer"
+            >
+              <LogOut className="w-3.5 h-3.5" />
+            </button>
+          </div>
+        </div>
+      </aside>
+
+      {/* ── MAIN CONTENT AREA ─────────────────────────────────────────── */}
+      <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
+        
+        {/* Top Header */}
+        <header className="h-14 bg-[#17231B] border-b border-[#304A39] px-6 flex items-center justify-between gap-4 flex-shrink-0 z-30">
+          
+          {/* Breadcrumb & Project Key */}
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="px-2 py-0.5 rounded-md bg-[#1B2B21] border border-[#304A39] text-[#B8F28B] text-xs font-mono font-bold">
+              {project.key}
+            </div>
+            <div className="flex items-center gap-2 text-xs">
+              <span className="text-[#A7BDAA] hidden sm:inline">Cinemora Studios</span>
+              <span className="text-[#304A39] hidden sm:inline">/</span>
+              <span className="text-[#E9F5E9] font-medium capitalize">{activeTab}</span>
+            </div>
+          </div>
+
+          {/* Quick Search */}
+          <div className="flex-1 max-w-md mx-2">
+            <button
+              onClick={openSearch}
+              className="w-full flex items-center gap-2.5 px-3 py-1.5 bg-[#101914] border border-[#304A39] hover:border-[#77C98A] rounded-xl text-xs text-[#A7BDAA] transition-all cursor-pointer text-left"
+            >
+              <Search className="w-3.5 h-3.5 text-[#A7BDAA]" />
+              <span className="flex-1 truncate">Search issues, keys, or tasks…</span>
+              <kbd className="hidden sm:inline-flex items-center px-1.5 py-0.5 bg-[#17231B] border border-[#304A39] rounded text-[10px] text-[#A7BDAA] font-mono">
+                ⌘K
+              </kbd>
+            </button>
+          </div>
+
+          {/* Header Actions */}
+          <div className="flex items-center gap-1.5 flex-shrink-0">
+            {/* Keyboard shortcuts trigger */}
+            <button
+              onClick={() => setShowShortcutsModal(true)}
+              title="Keyboard Shortcuts"
+              className="p-2 text-[#A7BDAA] hover:text-[#E9F5E9] hover:bg-[#1B2B21] rounded-lg transition-colors cursor-pointer"
+            >
+              <Keyboard className="w-4 h-4" />
+            </button>
+
+            {/* Notifications */}
+            <div className="relative">
+              <button
+                onClick={() => { closeAllMenus(); setShowNotifications(v => !v); }}
+                className="p-2 text-[#A7BDAA] hover:text-[#E9F5E9] hover:bg-[#1B2B21] rounded-lg transition-colors relative cursor-pointer"
+              >
+                <Bell className="w-4 h-4" />
+                {unreadCount > 0 && (
+                  <span className="absolute 1 top-1 right-1 w-2 h-2 bg-[#B8F28B] rounded-full ring-2 ring-[#17231B]" />
+                )}
+              </button>
+
+              {showNotifications && (
+                <>
+                  <div className="fixed inset-0 z-40" onClick={() => setShowNotifications(false)} />
+                  <div className="absolute right-0 top-full mt-2 w-80 bg-[#17231B] border border-[#304A39] rounded-2xl shadow-2xl z-50 overflow-hidden">
+                    <div className="px-4 py-3 border-b border-[#304A39] flex items-center justify-between">
+                      <h3 className="font-semibold text-[#E9F5E9] text-xs">Activity Notifications</h3>
+                      <span className="text-[10px] text-[#A7BDAA]">{recentActivities.length} recent</span>
+                    </div>
+                    <div className="max-h-80 overflow-y-auto divide-y divide-[#304A39]/50">
+                      {recentActivities.length === 0 ? (
+                        <p className="px-4 py-8 text-center text-xs text-[#A7BDAA]">No recent activity logged</p>
+                      ) : recentActivities.map(act => {
+                        const actUser = users.find(u => u.id === act.userId);
+                        return (
+                          <div key={act.id} className="px-4 py-3 hover:bg-[#1B2B21] transition-colors">
+                            <div className="flex items-start gap-2.5">
+                              <div className="w-6 h-6 rounded-lg bg-[#1B2B21] border border-[#304A39] flex items-center justify-center text-[10px] font-bold text-[#77C98A] flex-shrink-0 mt-0.5">
+                                {actUser?.name.split(' ').map(n => n[0]).join('') ?? '?'}
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <p className="text-xs text-[#E9F5E9] leading-relaxed">
+                                  <span className="font-medium text-[#B8F28B]">{actUser?.name ?? 'Someone'}</span>{' '}{act.details}
+                                </p>
+                                <p className="text-[10px] text-[#A7BDAA] mt-1 font-mono">
+                                  {new Date(act.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                    <div className="px-4 py-2 border-t border-[#304A39] bg-[#132018]">
+                      <button
+                        onClick={() => { setActiveTab('activity'); setShowNotifications(false); }}
+                        className="text-xs text-[#B8F28B] hover:underline"
+                      >
+                        View all activity feed →
+                      </button>
+                    </div>
+                  </div>
+                </>
+              )}
+            </div>
+
+            {/* Help Menu */}
+            <div className="relative">
+              <button
+                onClick={() => { closeAllMenus(); setShowHelpMenu(v => !v); }}
+                className="p-2 text-[#A7BDAA] hover:text-[#E9F5E9] hover:bg-[#1B2B21] rounded-lg transition-colors cursor-pointer"
+              >
+                <HelpCircle className="w-4 h-4" />
+              </button>
+              {showHelpMenu && (
+                <>
+                  <div className="fixed inset-0 z-40" onClick={() => setShowHelpMenu(false)} />
+                  <div className="absolute right-0 top-full mt-2 w-56 bg-[#17231B] border border-[#304A39] rounded-2xl shadow-2xl py-2 z-50">
+                    <div className="px-4 py-1.5 border-b border-[#304A39] mb-1">
+                      <p className="text-[10px] font-semibold text-[#A7BDAA] uppercase tracking-wider">Cinemora Resources</p>
+                    </div>
+                    <button
+                      onClick={() => { setShowThemePanel(true); setShowHelpMenu(false); }}
+                      className="w-full px-4 py-2 text-left text-xs text-[#E9F5E9] hover:bg-[#1B2B21] flex items-center gap-2.5"
+                    >
+                      <Sparkles className="w-3.5 h-3.5 text-[#B8F28B]" /> Design System Specs
+                    </button>
+                    <button
+                      onClick={() => { setShowShortcutsModal(true); setShowHelpMenu(false); }}
+                      className="w-full px-4 py-2 text-left text-xs text-[#E9F5E9] hover:bg-[#1B2B21] flex items-center gap-2.5"
+                    >
+                      <Keyboard className="w-3.5 h-3.5 text-[#77C98A]" /> Keyboard Shortcuts
+                    </button>
+                    <button
+                      onClick={() => { setShowBugModal(true); setShowHelpMenu(false); }}
+                      className="w-full px-4 py-2 text-left text-xs text-[#E9F5E9] hover:bg-[#1B2B21] flex items-center gap-2.5"
+                    >
+                      <Bug className="w-3.5 h-3.5 text-[#A7BDAA]" /> Submit Issue Report
+                    </button>
+                  </div>
+                </>
+              )}
+            </div>
+
+            {/* Profile trigger */}
+            <div className="relative ml-1">
+              <button
+                onClick={() => { closeAllMenus(); setShowUserMenu(v => !v); }}
+                className="w-8 h-8 rounded-xl bg-gradient-to-br from-[#77C98A] to-[#1B2B21] border border-[#304A39] flex items-center justify-center text-[#E9F5E9] text-xs font-semibold hover:border-[#B8F28B] transition-all cursor-pointer"
+                title={currentUser?.name}
+              >
+                {getInitials(currentUser?.name || 'User')}
+              </button>
+
+              {showUserMenu && (
+                <>
+                  <div className="fixed inset-0 z-40" onClick={() => setShowUserMenu(false)} />
+                  <div className="absolute right-0 top-full mt-2 w-64 bg-[#17231B] border border-[#304A39] rounded-2xl shadow-2xl py-2 z-50">
+                    <div className="px-4 py-3 border-b border-[#304A39]">
+                      <div className="font-semibold text-xs text-[#E9F5E9] truncate">{currentUser?.name}</div>
+                      <div className="text-[11px] text-[#A7BDAA] truncate">{currentUser?.email}</div>
+                      <div className="text-[10px] text-[#77C98A] capitalize mt-1 font-mono">Role: {currentUser?.role}</div>
+                    </div>
+                    <div className="py-1">
+                      <button
+                        onClick={() => { setShowProfileModal(true); setShowUserMenu(false); }}
+                        className="w-full px-4 py-2 text-left text-xs text-[#E9F5E9] hover:bg-[#1B2B21] flex items-center gap-2.5"
+                      >
+                        <User className="w-3.5 h-3.5 text-[#A7BDAA]" /> Profile Overview
+                      </button>
+                      <button
+                        onClick={() => { setActiveTab('settings'); setShowUserMenu(false); }}
+                        className="w-full px-4 py-2 text-left text-xs text-[#E9F5E9] hover:bg-[#1B2B21] flex items-center gap-2.5"
+                      >
+                        <Settings className="w-3.5 h-3.5 text-[#A7BDAA]" /> Workspace Settings
+                      </button>
+                      <button
+                        onClick={() => { setShowThemePanel(true); setShowUserMenu(false); }}
+                        className="w-full px-4 py-2 text-left text-xs text-[#E9F5E9] hover:bg-[#1B2B21] flex items-center gap-2.5"
+                      >
+                        <Sparkles className="w-3.5 h-3.5 text-[#B8F28B]" /> Design System
+                      </button>
+                    </div>
+                    <div className="border-t border-[#304A39] pt-1">
+                      <button
+                        onClick={() => { logout(); setShowUserMenu(false); }}
+                        className="w-full px-4 py-2 text-left text-xs text-red-400 hover:bg-[#1B2B21] flex items-center gap-2.5"
+                      >
+                        <LogOut className="w-3.5 h-3.5" /> Sign Out
+                      </button>
+                    </div>
+                  </div>
+                </>
+              )}
+            </div>
+          </div>
+        </header>
+
+        {/* View Content Area */}
+        <main className="flex-1 overflow-y-auto bg-[#101914] p-6">
+          {renderView()}
+        </main>
       </div>
 
-      {/* ── MAIN CONTENT ────────────────────────────────────────────────── */}
-      <div className="flex-1 overflow-y-auto">
-        <div className="p-6">{renderView()}</div>
-      </div>
-
-      {/* ══════════ MODALS ══════════ */}
+      {/* ══════════ MODALS & OVERLAYS ══════════ */}
 
       {isCreateIssueOpen && (
         <CreateIssueModal
@@ -415,50 +464,50 @@ export const ModernDashboard: React.FC = () => {
 
       {/* ── SEARCH OVERLAY ─────────────────────────────────────────────── */}
       {showSearch && (
-        <div className="fixed inset-0 z-50 flex items-start justify-center pt-24 px-4">
-          <div className="absolute inset-0 bg-black bg-opacity-40" onClick={closeSearch} />
-          <div className="relative w-full max-w-xl bg-white rounded-xl shadow-2xl border border-gray-200 overflow-hidden">
-            <div className="flex items-center gap-3 px-4 py-3 border-b border-gray-100">
-              <Search className="w-5 h-5 text-gray-400 flex-shrink-0" />
+        <div className="fixed inset-0 z-50 flex items-start justify-center pt-20 px-4">
+          <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={closeSearch} />
+          <div className="relative w-full max-w-xl bg-[#17231B] border border-[#304A39] rounded-2xl shadow-2xl overflow-hidden z-10">
+            <div className="flex items-center gap-3 px-4 py-3.5 border-b border-[#304A39]">
+              <Search className="w-4 h-4 text-[#A7BDAA] flex-shrink-0" />
               <input
                 ref={searchRef}
                 type="text"
                 value={searchQuery}
                 onChange={e => setSearchQuery(e.target.value)}
-                placeholder="Search issues by title, key or description…"
-                className="flex-1 text-sm text-gray-800 placeholder-gray-400 outline-none bg-transparent"
+                placeholder="Search by issue title, key, or details…"
+                className="flex-1 text-xs text-[#E9F5E9] placeholder-[#A7BDAA]/50 outline-none bg-transparent"
               />
               {searchQuery && (
-                <button onClick={() => setSearchQuery('')} className="text-gray-400 hover:text-gray-600">
-                  <X className="w-4 h-4" />
+                <button onClick={() => setSearchQuery('')} className="text-[#A7BDAA] hover:text-[#E9F5E9]">
+                  <X className="w-3.5 h-3.5" />
                 </button>
               )}
-              <kbd className="hidden sm:inline-flex px-1.5 py-0.5 bg-gray-100 border border-gray-200 rounded text-[10px] text-gray-400 font-mono">Esc</kbd>
+              <kbd className="hidden sm:inline-flex px-1.5 py-0.5 bg-[#1B2B21] border border-[#304A39] rounded text-[10px] text-[#A7BDAA] font-mono">Esc</kbd>
             </div>
             {searchQuery.trim() ? (
-              <div className="max-h-80 overflow-y-auto">
+              <div className="max-h-80 overflow-y-auto divide-y divide-[#304A39]/40">
                 {searchResults.length === 0 ? (
-                  <p className="px-4 py-8 text-center text-sm text-gray-400">No issues found for "{searchQuery}"</p>
+                  <p className="px-4 py-8 text-center text-xs text-[#A7BDAA]">No issues matched "{searchQuery}"</p>
                 ) : searchResults.map(issue => (
                   <button
                     key={issue.id}
                     onClick={() => { setSearchSelectedIssue(issue); closeSearch(); }}
-                    className="w-full px-4 py-3 text-left hover:bg-gray-50 flex items-center gap-3 border-b border-gray-50 last:border-0"
+                    className="w-full px-4 py-3 text-left hover:bg-[#1B2B21] flex items-center gap-3 transition-colors"
                   >
-                    <span className="text-xs text-gray-400 font-mono w-16 flex-shrink-0">{issue.key}</span>
-                    <span className="text-sm text-gray-800 flex-1 truncate">{issue.title}</span>
-                    <span className={`text-xs px-2 py-0.5 rounded-full flex-shrink-0 ${
-                      issue.status === 'done' ? 'bg-green-100 text-green-700' :
-                      issue.status === 'in-progress' ? 'bg-blue-100 text-blue-700' :
-                      issue.status === 'in-review' ? 'bg-purple-100 text-purple-700' :
-                      'bg-gray-100 text-gray-600'
+                    <span className="text-xs text-[#B8F28B] font-mono w-16 flex-shrink-0">{issue.key}</span>
+                    <span className="text-xs text-[#E9F5E9] flex-1 truncate">{issue.title}</span>
+                    <span className={`text-[10px] px-2 py-0.5 rounded-full flex-shrink-0 font-medium ${
+                      issue.status === 'done' ? 'bg-[#B8F28B]/10 text-[#B8F28B] border border-[#304A39]' :
+                      issue.status === 'in-progress' ? 'bg-[#77C98A]/10 text-[#77C98A] border border-[#304A39]' :
+                      issue.status === 'in-review' ? 'bg-blue-900/20 text-blue-300 border border-[#304A39]' :
+                      'bg-[#1B2B21] text-[#A7BDAA] border border-[#304A39]'
                     }`}>{issue.status}</span>
-                    <ChevronRight className="w-3.5 h-3.5 text-gray-300 flex-shrink-0" />
+                    <ChevronRight className="w-3.5 h-3.5 text-[#A7BDAA] flex-shrink-0" />
                   </button>
                 ))}
               </div>
             ) : (
-              <p className="px-4 py-6 text-center text-sm text-gray-400">Start typing to search across all issues</p>
+              <p className="px-4 py-6 text-center text-xs text-[#A7BDAA]">Type an issue key or keywords to search across the entire workspace</p>
             )}
           </div>
         </div>
@@ -470,38 +519,38 @@ export const ModernDashboard: React.FC = () => {
 
       {/* ── KEYBOARD SHORTCUTS ─────────────────────────────────────────── */}
       {showShortcutsModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl w-full max-w-md shadow-2xl">
-            <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-[#17231B] border border-[#304A39] rounded-2xl w-full max-w-md shadow-2xl overflow-hidden">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-[#304A39]">
               <div className="flex items-center gap-2">
-                <Keyboard className="w-5 h-5 text-gray-500" />
-                <h2 className="text-lg font-semibold text-gray-900">Keyboard Shortcuts</h2>
+                <Keyboard className="w-4 h-4 text-[#B8F28B]" />
+                <h2 className="text-sm font-semibold text-[#E9F5E9]">Keyboard Shortcuts</h2>
               </div>
-              <button onClick={() => setShowShortcutsModal(false)} className="p-1 hover:bg-gray-100 rounded-lg">
-                <X className="w-5 h-5 text-gray-500" />
+              <button onClick={() => setShowShortcutsModal(false)} className="p-1 hover:bg-[#1B2B21] rounded-lg text-[#A7BDAA]">
+                <X className="w-4 h-4" />
               </button>
             </div>
-            <div className="p-6 space-y-1">
+            <div className="p-6 space-y-2">
               {[
-                { keys: ['⌘', 'K'], label: 'Open search' },
-                { keys: ['C'],       label: 'Create new issue' },
-                { keys: ['Esc'],     label: 'Close any modal or overlay' },
-                { keys: ['Enter'],   label: 'Submit a comment' },
-                { keys: ['Tab'],     label: 'Navigate between form fields' },
+                { keys: ['⌘', 'K'], label: 'Global Issue Search' },
+                { keys: ['C'],       label: 'Quick Create Task' },
+                { keys: ['Esc'],     label: 'Dismiss Any Modal or Dropdown' },
+                { keys: ['Enter'],   label: 'Submit Active Comment' },
+                { keys: ['Tab'],     label: 'Navigate Form Fields' },
               ].map(({ keys, label }) => (
-                <div key={label} className="flex items-center justify-between py-2.5 border-b border-gray-50 last:border-0">
-                  <span className="text-sm text-gray-700">{label}</span>
+                <div key={label} className="flex items-center justify-between py-2 border-b border-[#304A39]/40 last:border-0">
+                  <span className="text-xs text-[#E9F5E9]">{label}</span>
                   <div className="flex items-center gap-1">
                     {keys.map(k => (
-                      <kbd key={k} className="px-2 py-1 bg-gray-100 border border-gray-300 rounded text-xs font-mono text-gray-600 shadow-sm">{k}</kbd>
+                      <kbd key={k} className="px-2 py-0.5 bg-[#1B2B21] border border-[#304A39] rounded text-[11px] font-mono text-[#B8F28B]">{k}</kbd>
                     ))}
                   </div>
                 </div>
               ))}
             </div>
-            <div className="px-6 py-4 border-t border-gray-100 flex justify-end">
-              <button onClick={() => setShowShortcutsModal(false)} className="px-4 py-2 text-sm bg-[#0052CC] text-white rounded-lg hover:bg-[#0065FF]">
-                Got it
+            <div className="px-6 py-3 border-t border-[#304A39] bg-[#132018] flex justify-end">
+              <button onClick={() => setShowShortcutsModal(false)} className="px-4 py-1.5 text-xs bg-[#B8F28B] text-[#101914] font-semibold rounded-xl hover:bg-[#77C98A]">
+                Close
               </button>
             </div>
           </div>
@@ -510,47 +559,47 @@ export const ModernDashboard: React.FC = () => {
 
       {/* ── REPORT A BUG ───────────────────────────────────────────────── */}
       {showBugModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl w-full max-w-md shadow-2xl">
-            <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-[#17231B] border border-[#304A39] rounded-2xl w-full max-w-md shadow-2xl overflow-hidden">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-[#304A39]">
               <div className="flex items-center gap-2">
-                <Bug className="w-5 h-5 text-red-500" />
-                <h2 className="text-lg font-semibold text-gray-900">Report a Bug</h2>
+                <Bug className="w-4 h-4 text-[#77C98A]" />
+                <h2 className="text-sm font-semibold text-[#E9F5E9]">Submit Feedback / Issue</h2>
               </div>
-              <button onClick={() => setShowBugModal(false)} className="p-1 hover:bg-gray-100 rounded-lg">
-                <X className="w-5 h-5 text-gray-500" />
+              <button onClick={() => setShowBugModal(false)} className="p-1 hover:bg-[#1B2B21] rounded-lg text-[#A7BDAA]">
+                <X className="w-4 h-4" />
               </button>
             </div>
             {bugSubmitted ? (
               <div className="px-6 py-10 text-center">
-                <CheckCircle2 className="w-12 h-12 text-green-500 mx-auto mb-3" />
-                <p className="font-semibold text-gray-900">Thank you for the report!</p>
-                <p className="text-sm text-gray-500 mt-1">We'll look into it shortly.</p>
+                <CheckCircle2 className="w-10 h-10 text-[#B8F28B] mx-auto mb-3" />
+                <p className="font-semibold text-sm text-[#E9F5E9]">Report Received</p>
+                <p className="text-xs text-[#A7BDAA] mt-1">Stored in internal workspace activity log.</p>
               </div>
             ) : (
               <div className="p-6 space-y-4">
-                <div className="flex items-start gap-2 p-3 bg-amber-50 border border-amber-100 rounded-lg">
-                  <AlertTriangle className="w-4 h-4 text-amber-500 flex-shrink-0 mt-0.5" />
-                  <p className="text-xs text-amber-700">This is a demo app — reports are stored locally only.</p>
+                <div className="flex items-start gap-2 p-3 bg-[#1B2B21] border border-[#304A39] rounded-xl text-xs text-[#A7BDAA]">
+                  <AlertTriangle className="w-4 h-4 text-[#77C98A] flex-shrink-0 mt-0.5" />
+                  <p>Internal Cinemora feedback tool. Records are saved locally in the browser.</p>
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-gray-500 uppercase mb-1">Describe the bug</label>
+                  <label className="block text-[10px] font-semibold text-[#A7BDAA] uppercase tracking-wider mb-1.5">Description</label>
                   <textarea
                     value={bugText}
                     onChange={e => setBugText(e.target.value)}
                     rows={4}
-                    placeholder="What happened? What did you expect to happen?"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+                    placeholder="Describe observations, requirements, or issues…"
+                    className="w-full px-3 py-2 bg-[#132018] border border-[#304A39] rounded-xl text-xs text-[#E9F5E9] placeholder-[#A7BDAA]/40 focus:outline-none focus:border-[#B8F28B] resize-none"
                   />
                 </div>
-                <div className="flex gap-3 justify-end">
-                  <button onClick={() => setShowBugModal(false)} className="px-4 py-2 text-sm border border-gray-300 rounded-lg hover:bg-gray-50">Cancel</button>
+                <div className="flex gap-2 justify-end">
+                  <button onClick={() => setShowBugModal(false)} className="px-3 py-1.5 text-xs text-[#A7BDAA] hover:text-[#E9F5E9]">Cancel</button>
                   <button
                     onClick={handleBugSubmit}
                     disabled={!bugText.trim()}
-                    className="px-4 py-2 text-sm bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors disabled:opacity-50"
+                    className="px-4 py-1.5 text-xs bg-[#B8F28B] text-[#101914] font-semibold rounded-xl hover:bg-[#77C98A] disabled:opacity-40"
                   >
-                    Submit Report
+                    Submit
                   </button>
                 </div>
               </div>
@@ -559,79 +608,99 @@ export const ModernDashboard: React.FC = () => {
         </div>
       )}
 
-      {/* ── PROFILE ────────────────────────────────────────────────────── */}
+      {/* ── PROFILE MODAL ──────────────────────────────────────────────── */}
       {showProfileModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl w-full max-w-md shadow-2xl">
-            <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
-              <h2 className="text-lg font-semibold text-gray-900">Your Profile</h2>
-              <button onClick={() => setShowProfileModal(false)} className="p-1 hover:bg-gray-100 rounded-lg">
-                <X className="w-5 h-5 text-gray-500" />
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-[#17231B] border border-[#304A39] rounded-2xl w-full max-w-md shadow-2xl overflow-hidden">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-[#304A39]">
+              <h2 className="text-sm font-semibold text-[#E9F5E9]">Cinemora Profile</h2>
+              <button onClick={() => setShowProfileModal(false)} className="p-1 hover:bg-[#1B2B21] rounded-lg text-[#A7BDAA]">
+                <X className="w-4 h-4" />
               </button>
             </div>
-            <div className="p-6 space-y-5">
+            <div className="p-6 space-y-4">
               <div className="flex justify-center">
-                <div className="w-20 h-20 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white text-3xl font-bold">
+                <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#B8F28B] to-[#77C98A] flex items-center justify-center text-[#101914] text-xl font-bold">
                   {getInitials(currentUser?.name || 'User')}
                 </div>
               </div>
               <div className="space-y-3">
-                {[{ label: 'Full Name', value: currentUser?.name }, { label: 'Email', value: currentUser?.email }].map(f => (
-                  <div key={f.label}>
-                    <label className="block text-xs font-semibold text-gray-500 uppercase mb-1">{f.label}</label>
-                    <div className="px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-800">{f.value}</div>
-                  </div>
-                ))}
                 <div>
-                  <label className="block text-xs font-semibold text-gray-500 uppercase mb-1">Role</label>
-                  <div className="px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm">
-                    <span className={`capitalize font-medium flex items-center gap-1.5 ${currentUser?.role === 'admin' ? 'text-purple-700' : 'text-blue-700'}`}>
-                      {currentUser?.role === 'admin' && <ShieldCheck className="w-3.5 h-3.5" />}
-                      {currentUser?.role}
-                    </span>
+                  <label className="block text-[10px] font-semibold text-[#A7BDAA] uppercase tracking-wider mb-1">Full Name</label>
+                  <div className="px-3 py-2 bg-[#132018] border border-[#304A39] rounded-xl text-xs text-[#E9F5E9]">{currentUser?.name}</div>
+                </div>
+                <div>
+                  <label className="block text-[10px] font-semibold text-[#A7BDAA] uppercase tracking-wider mb-1">Work Email</label>
+                  <div className="px-3 py-2 bg-[#132018] border border-[#304A39] rounded-xl text-xs text-[#E9F5E9] font-mono">{currentUser?.email}</div>
+                </div>
+                <div>
+                  <label className="block text-[10px] font-semibold text-[#A7BDAA] uppercase tracking-wider mb-1">Role / Permissions</label>
+                  <div className="px-3 py-2 bg-[#132018] border border-[#304A39] rounded-xl text-xs text-[#77C98A] font-semibold flex items-center gap-1.5 capitalize">
+                    <ShieldCheck className="w-3.5 h-3.5 text-[#B8F28B]" />
+                    {currentUser?.role === 'admin' ? 'Founder / Admin (Full Access)' : currentUser?.role}
                   </div>
                 </div>
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="bg-blue-50 rounded-lg p-3 text-center">
-                    <div className="text-2xl font-bold text-[#0052CC]">{issues.filter(i => i.assigneeId === currentUser?.id).length}</div>
-                    <div className="text-xs text-gray-500 mt-0.5">Assigned</div>
+                <div className="grid grid-cols-2 gap-3 pt-2">
+                  <div className="bg-[#1B2B21] border border-[#304A39] rounded-xl p-3 text-center">
+                    <div className="text-xl font-bold text-[#B8F28B]">{issues.filter(i => i.assigneeId === currentUser?.id).length}</div>
+                    <div className="text-[10px] text-[#A7BDAA] mt-0.5">Assigned Tasks</div>
                   </div>
-                  <div className="bg-green-50 rounded-lg p-3 text-center">
-                    <div className="text-2xl font-bold text-green-600">{issues.filter(i => i.assigneeId === currentUser?.id && i.status === 'done').length}</div>
-                    <div className="text-xs text-gray-500 mt-0.5">Completed</div>
+                  <div className="bg-[#1B2B21] border border-[#304A39] rounded-xl p-3 text-center">
+                    <div className="text-xl font-bold text-[#77C98A]">{issues.filter(i => i.assigneeId === currentUser?.id && i.status === 'done').length}</div>
+                    <div className="text-[10px] text-[#A7BDAA] mt-0.5">Completed Tasks</div>
                   </div>
                 </div>
               </div>
             </div>
-            <div className="px-6 py-4 border-t border-gray-100 flex justify-end gap-2">
-              <button onClick={() => { setShowProfileModal(false); setActiveTab('settings'); }} className="px-4 py-2 text-sm border border-gray-300 rounded-lg hover:bg-gray-50">Go to Settings</button>
-              <button onClick={() => setShowProfileModal(false)} className="px-4 py-2 text-sm bg-[#0052CC] text-white rounded-lg hover:bg-[#0065FF]">Close</button>
+            <div className="px-6 py-3 border-t border-[#304A39] bg-[#132018] flex justify-end gap-2">
+              <button onClick={() => { setShowProfileModal(false); setActiveTab('settings'); }} className="px-3 py-1.5 text-xs text-[#A7BDAA] hover:text-[#E9F5E9]">Account Settings</button>
+              <button onClick={() => setShowProfileModal(false)} className="px-4 py-1.5 text-xs bg-[#B8F28B] text-[#101914] font-semibold rounded-xl hover:bg-[#77C98A]">Done</button>
             </div>
           </div>
         </div>
       )}
 
-      {/* ── THEME ──────────────────────────────────────────────────────── */}
+      {/* ── THEME PANEL ────────────────────────────────────────────────── */}
       {showThemePanel && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl w-full max-w-sm shadow-2xl">
-            <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
-              <h2 className="text-lg font-semibold text-gray-900">Theme</h2>
-              <button onClick={() => setShowThemePanel(false)} className="p-1 hover:bg-gray-100 rounded-lg"><X className="w-5 h-5 text-gray-500" /></button>
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-[#17231B] border border-[#304A39] rounded-2xl w-full max-w-sm shadow-2xl overflow-hidden">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-[#304A39]">
+              <div className="flex items-center gap-2">
+                <Sparkles className="w-4 h-4 text-[#B8F28B]" />
+                <h2 className="text-sm font-semibold text-[#E9F5E9]">Cinemora Design Tokens</h2>
+              </div>
+              <button onClick={() => setShowThemePanel(false)} className="p-1 hover:bg-[#1B2B21] rounded-lg text-[#A7BDAA]"><X className="w-4 h-4" /></button>
             </div>
             <div className="p-6 space-y-3">
-              <div className="flex items-center gap-4 p-4 rounded-xl border-2 border-[#0052CC] bg-blue-50">
-                <Sun className="w-5 h-5 text-[#0052CC]" />
-                <div><div className="font-medium text-sm text-gray-900">Light</div><div className="text-xs text-gray-500">Default clean interface</div></div>
-                <CheckCircle2 className="w-4 h-4 text-[#0052CC] ml-auto" />
+              <div className="flex items-center gap-3 p-3 rounded-xl border border-[#B8F28B] bg-[#1B2B21]">
+                <div className="w-5 h-5 rounded-md bg-[#B8F28B] flex-shrink-0" />
+                <div>
+                  <div className="font-semibold text-xs text-[#E9F5E9]">Cinemora Dark Green</div>
+                  <div className="text-[10px] text-[#A7BDAA]">Official agency theme #101914 / #B8F28B</div>
+                </div>
+                <CheckCircle2 className="w-4 h-4 text-[#B8F28B] ml-auto" />
               </div>
-              <div className="flex items-center gap-4 p-4 rounded-xl border-2 border-gray-100 bg-gray-50 opacity-60 cursor-not-allowed">
-                <Moon className="w-5 h-5 text-gray-400" />
-                <div><div className="font-medium text-sm text-gray-900">Dark</div><div className="text-xs text-gray-400">Coming soon</div></div>
+              <div className="grid grid-cols-2 gap-2 pt-2 text-[10px] font-mono text-[#A7BDAA]">
+                <div className="p-2 bg-[#132018] rounded-lg border border-[#304A39] flex items-center gap-2">
+                  <span className="w-3 h-3 rounded bg-[#101914] border border-[#304A39]" />
+                  <span>#101914 Base</span>
+                </div>
+                <div className="p-2 bg-[#132018] rounded-lg border border-[#304A39] flex items-center gap-2">
+                  <span className="w-3 h-3 rounded bg-[#17231B] border border-[#304A39]" />
+                  <span>#17231B Surface</span>
+                </div>
+                <div className="p-2 bg-[#132018] rounded-lg border border-[#304A39] flex items-center gap-2">
+                  <span className="w-3 h-3 rounded bg-[#1B2B21] border border-[#304A39]" />
+                  <span>#1B2B21 Card</span>
+                </div>
+                <div className="p-2 bg-[#132018] rounded-lg border border-[#304A39] flex items-center gap-2">
+                  <span className="w-3 h-3 rounded bg-[#B8F28B]" />
+                  <span>#B8F28B Accent</span>
+                </div>
               </div>
             </div>
-            <div className="px-6 py-4 border-t border-gray-100 flex justify-end">
-              <button onClick={() => setShowThemePanel(false)} className="px-4 py-2 text-sm bg-[#0052CC] text-white rounded-lg hover:bg-[#0065FF]">Done</button>
+            <div className="px-6 py-3 border-t border-[#304A39] bg-[#132018] flex justify-end">
+              <button onClick={() => setShowThemePanel(false)} className="px-4 py-1.5 text-xs bg-[#B8F28B] text-[#101914] font-semibold rounded-xl hover:bg-[#77C98A]">Close</button>
             </div>
           </div>
         </div>

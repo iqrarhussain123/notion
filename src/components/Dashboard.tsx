@@ -343,8 +343,8 @@ export const Dashboard: React.FC = () => {
       {/* Sidebar */}
       <div className="w-64 bg-indigo-900 text-white flex flex-col">
         <div className="p-6">
-          <h1 className="text-2xl font-bold">TaskFlow</h1>
-          <p className="text-sm text-indigo-300">{project.name}</p>
+          <h1 className="text-2xl font-bold">Cinemora Studios</h1>
+          <p className="text-sm text-[#77C98A]">Agency Workspace</p>
         </div>
 
         <nav className="flex-1 px-4 space-y-1">

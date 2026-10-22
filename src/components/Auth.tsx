@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useApp } from '../context/AppContext';
+import { ShieldCheck, Lock, Mail, User as UserIcon, ArrowRight, Sparkles } from 'lucide-react';
 
 export const Auth: React.FC = () => {
   const { login, signup } = useApp();
@@ -18,7 +19,7 @@ export const Auth: React.FC = () => {
     if (isLogin) {
       const success = login(formData.email, formData.password);
       if (!success) {
-        setError('Invalid email or password');
+        setError('Invalid email or password. Please verify your Cinemora credentials.');
       }
     } else {
       if (!formData.name.trim()) {
@@ -27,116 +28,162 @@ export const Auth: React.FC = () => {
       }
       const success = signup(formData.name, formData.email, formData.password);
       if (!success) {
-        setError('Email already exists');
+        setError('An account with this email already exists.');
       }
     }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
-      <div className="bg-white rounded-lg shadow-xl p-8 w-full max-w-md">
+    <div className="min-h-screen bg-[#101914] text-[#E9F5E9] flex flex-col items-center justify-center p-4 relative overflow-hidden select-none">
+      {/* Background ambient lighting */}
+      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[#77C98A]/5 blur-[120px] rounded-full pointer-events-none" />
+      <div className="absolute bottom-10 right-10 w-[300px] h-[300px] bg-[#B8F28B]/5 blur-[100px] rounded-full pointer-events-none" />
+
+      {/* Main card */}
+      <div className="w-full max-w-md bg-[#17231B] border border-[#304A39] rounded-2xl shadow-2xl p-8 relative z-10 backdrop-blur-sm">
+        
+        {/* Brand Header */}
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-indigo-600 mb-2">TaskFlow</h1>
-          <p className="text-gray-600">Project Management Platform</p>
+          <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-[#1B2B21] border border-[#304A39] mb-4 shadow-inner relative group">
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#B8F28B] to-[#77C98A] flex items-center justify-center text-[#101914] shadow-md transition-transform duration-300 group-hover:scale-105">
+              <span className="font-extrabold text-sm tracking-tighter">CS</span>
+            </div>
+            <div className="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-[#17231B] border border-[#304A39] flex items-center justify-center">
+              <div className="w-2 h-2 rounded-full bg-[#B8F28B] animate-pulse" />
+            </div>
+          </div>
+
+          <h1 className="text-2xl font-bold tracking-tight text-[#E9F5E9] flex items-center justify-center gap-2">
+            Cinemora Studios
+          </h1>
+          <div className="flex items-center justify-center gap-2 mt-1">
+            <span className="text-xs font-semibold tracking-wider uppercase text-[#77C98A]">Agency Workspace</span>
+            <span className="text-[#304A39]">•</span>
+            <span className="text-xs font-mono text-[#A7BDAA]">cinemorastudios.agency</span>
+          </div>
+          <p className="text-xs text-[#A7BDAA] mt-2">
+            Brand, Content, Web & AI Growth Systems
+          </p>
         </div>
 
-        <div className="flex mb-6 bg-gray-100 rounded-lg p-1">
+        {/* Tab Switcher */}
+        <div className="flex mb-6 bg-[#132018] border border-[#304A39] rounded-xl p-1">
           <button
+            type="button"
             onClick={() => {
               setIsLogin(true);
               setError('');
             }}
-            className={`flex-1 py-2 rounded-md transition-colors ${
+            className={`flex-1 py-2 text-xs font-semibold rounded-lg transition-all ${
               isLogin
-                ? 'bg-white text-indigo-600 shadow'
-                : 'text-gray-600 hover:text-gray-800'
+                ? 'bg-[#B8F28B] text-[#101914] shadow-sm'
+                : 'text-[#A7BDAA] hover:text-[#E9F5E9]'
             }`}
           >
-            Login
+            Sign In
           </button>
           <button
+            type="button"
             onClick={() => {
               setIsLogin(false);
               setError('');
             }}
-            className={`flex-1 py-2 rounded-md transition-colors ${
+            className={`flex-1 py-2 text-xs font-semibold rounded-lg transition-all ${
               !isLogin
-                ? 'bg-white text-indigo-600 shadow'
-                : 'text-gray-600 hover:text-gray-800'
+                ? 'bg-[#B8F28B] text-[#101914] shadow-sm'
+                : 'text-[#A7BDAA] hover:text-[#E9F5E9]'
             }`}
           >
-            Sign Up
+            Join Team
           </button>
         </div>
 
+        {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-4">
           {!isLogin && (
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Name
+              <label className="block text-xs font-medium text-[#A7BDAA] uppercase tracking-wider mb-1.5">
+                Full Name
               </label>
-              <input
-                type="text"
-                value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                placeholder="John Doe"
-              />
+              <div className="relative">
+                <UserIcon className="w-4 h-4 text-[#A7BDAA] absolute left-3.5 top-1/2 -translate-y-1/2" />
+                <input
+                  type="text"
+                  value={formData.name}
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  className="w-full pl-10 pr-3 py-2.5 bg-[#132018] border border-[#304A39] rounded-xl text-sm text-[#E9F5E9] placeholder-[#A7BDAA]/40 focus:outline-none focus:border-[#B8F28B] focus:ring-1 focus:ring-[#B8F28B] transition-colors"
+                  placeholder="e.g. Iqrar Hussain"
+                />
+              </div>
             </div>
           )}
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Email
+            <label className="block text-xs font-medium text-[#A7BDAA] uppercase tracking-wider mb-1.5">
+              Work Email
             </label>
-            <input
-              type="email"
-              value={formData.email}
-              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
-              placeholder="you@company.com"
-              required
-            />
+            <div className="relative">
+              <Mail className="w-4 h-4 text-[#A7BDAA] absolute left-3.5 top-1/2 -translate-y-1/2" />
+              <input
+                type="email"
+                value={formData.email}
+                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                className="w-full pl-10 pr-3 py-2.5 bg-[#132018] border border-[#304A39] rounded-xl text-sm text-[#E9F5E9] placeholder-[#A7BDAA]/40 focus:outline-none focus:border-[#B8F28B] focus:ring-1 focus:ring-[#B8F28B] transition-colors"
+                placeholder="name@cinemorastudios.com"
+                required
+              />
+            </div>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-xs font-medium text-[#A7BDAA] uppercase tracking-wider mb-1.5">
               Password
             </label>
-            <input
-              type="password"
-              value={formData.password}
-              onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
-              placeholder="••••••••"
-              required
-            />
+            <div className="relative">
+              <Lock className="w-4 h-4 text-[#A7BDAA] absolute left-3.5 top-1/2 -translate-y-1/2" />
+              <input
+                type="password"
+                value={formData.password}
+                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                className="w-full pl-10 pr-3 py-2.5 bg-[#132018] border border-[#304A39] rounded-xl text-sm text-[#E9F5E9] placeholder-[#A7BDAA]/40 focus:outline-none focus:border-[#B8F28B] focus:ring-1 focus:ring-[#B8F28B] transition-colors"
+                placeholder="••••••••••••"
+                required
+              />
+            </div>
           </div>
 
           {error && (
-            <div className="bg-red-50 text-red-600 p-3 rounded-md text-sm">
-              {error}
+            <div className="bg-red-950/40 border border-red-800/60 text-red-300 p-3 rounded-xl text-xs flex items-start gap-2">
+              <span className="font-semibold text-red-400">Notice:</span> {error}
             </div>
           )}
 
           <button
             type="submit"
-            className="w-full bg-indigo-600 text-white py-2 rounded-md hover:bg-indigo-700 transition-colors font-medium"
+            className="w-full bg-[#B8F28B] hover:bg-[#77C98A] text-[#101914] py-2.5 rounded-xl transition-all font-semibold text-sm flex items-center justify-center gap-2 shadow-sm cursor-pointer mt-2"
           >
-            {isLogin ? 'Login' : 'Sign Up'}
+            {isLogin ? 'Enter Workspace' : 'Create Team Account'}
+            <ArrowRight className="w-4 h-4" />
           </button>
         </form>
 
-        <div className="mt-6 p-4 bg-gray-50 rounded-md">
-          <p className="text-xs text-gray-600 mb-2 font-semibold">Demo Credentials:</p>
-          <p className="text-xs text-gray-600">
-            <strong>Admin:</strong> admin@company.com / admin123
-          </p>
-          <p className="text-xs text-gray-500 mt-2">
-            Sign up with any email to create a new member account
+        {/* Security / Identity Information Footer */}
+        <div className="mt-6 pt-5 border-t border-[#304A39] text-center">
+          <div className="flex items-center justify-center gap-1.5 text-[11px] text-[#A7BDAA]">
+            <ShieldCheck className="w-3.5 h-3.5 text-[#77C98A]" />
+            <span>Cinemora Studios Internal Operating Workspace</span>
+          </div>
+          <p className="text-[10px] text-[#A7BDAA]/60 mt-1">
+            Browser-persisted workspace session • cinemorastudios.agency
           </p>
         </div>
       </div>
+
+      {/* Page footer */}
+      <footer className="mt-8 text-center text-xs text-[#A7BDAA]/60 flex items-center gap-2">
+        <Sparkles className="w-3.5 h-3.5 text-[#77C98A]" />
+        <span>Cinemora Studios © {new Date().getFullYear()}</span>
+      </footer>
     </div>
   );
 };

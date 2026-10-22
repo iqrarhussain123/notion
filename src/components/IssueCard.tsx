@@ -20,26 +20,26 @@ interface IssueCardProps {
 }
 
 const priorityColors: Record<string, string> = {
-  lowest: 'text-gray-400',
-  low: 'text-blue-400',
-  medium: 'text-yellow-500',
-  high: 'text-orange-500',
-  highest: 'text-red-500',
+  lowest: 'text-[#A7BDAA]',
+  low: 'text-[#77C98A]',
+  medium: 'text-amber-400',
+  high: 'text-orange-400',
+  highest: 'text-rose-400',
 };
 
 const priorityArrowColor: Record<string, string> = {
-  lowest: '#9CA3AF',
-  low: '#60A5FA',
-  medium: '#EAB308',
-  high: '#F97316',
-  highest: '#EF4444',
+  lowest: '#A7BDAA',
+  low: '#77C98A',
+  medium: '#FBBF24',
+  high: '#FB923C',
+  highest: '#F87171',
 };
 
 const typeIcons: Record<string, React.ReactNode> = {
-  story: <BookOpen className="w-3.5 h-3.5 text-green-600" />,
-  task: <Zap className="w-3.5 h-3.5 text-blue-600" />,
-  bug: <AlertCircle className="w-3.5 h-3.5 text-red-600" />,
-  epic: <Target className="w-3.5 h-3.5 text-purple-600" />,
+  story: <BookOpen className="w-3.5 h-3.5 text-[#77C98A]" />,
+  task: <Zap className="w-3.5 h-3.5 text-[#B8F28B]" />,
+  bug: <AlertCircle className="w-3.5 h-3.5 text-rose-400" />,
+  epic: <Target className="w-3.5 h-3.5 text-purple-400" />,
 };
 
 const getInitials = (name: string) =>
@@ -57,7 +57,6 @@ export const IssueCard: React.FC<IssueCardProps> = ({
 }) => {
   const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
     id: issue.id,
-    // @dnd-kit still needs the hook — we just don't spread listeners when not permitted
     disabled: !canDrag,
   });
 
@@ -69,43 +68,42 @@ export const IssueCard: React.FC<IssueCardProps> = ({
     <div
       ref={setNodeRef}
       style={style}
-      className={`bg-white rounded-lg border border-gray-200 p-3 transition-shadow select-none
-        ${isDragging ? 'opacity-50 shadow-xl ring-2 ring-blue-300' : 'shadow-sm hover:shadow-md'}
+      className={`bg-[#1B2B21] rounded-xl border border-[#304A39] p-3.5 transition-all select-none group
+        ${isDragging ? 'opacity-50 ring-2 ring-[#B8F28B] shadow-2xl scale-102' : 'shadow-sm hover:border-[#77C98A] hover:bg-[#213529]'}
         ${canDrag ? 'cursor-pointer' : 'cursor-default'}
       `}
       onClick={() => { if (!isDragging) onClick(); }}
     >
-      {/* Card top row — drag handle (only if permitted) + type icon + key + priority */}
-      <div className="flex items-center justify-between mb-2 gap-1">
+      {/* Top row: drag handle, type icon, key, priority */}
+      <div className="flex items-center justify-between mb-2 gap-1.5">
         <div className="flex items-center gap-1.5 min-w-0">
-          {/* Drag handle — only rendered and active when canDrag */}
           {canDrag ? (
             <span
-              className="flex-shrink-0 text-gray-300 hover:text-gray-500 transition-colors cursor-grab active:cursor-grabbing"
+              className="flex-shrink-0 text-[#A7BDAA]/40 group-hover:text-[#B8F28B] transition-colors cursor-grab active:cursor-grabbing p-0.5"
               {...listeners}
               {...attributes}
               onClick={e => e.stopPropagation()}
-              title="Drag to move"
+              title="Drag to change status"
             >
               <GripVertical className="w-3.5 h-3.5" />
             </span>
           ) : (
             <span
-              className="flex-shrink-0 text-gray-200"
-              title="You are not assigned to this issue"
+              className="flex-shrink-0 text-[#A7BDAA]/30 p-0.5"
+              title="Assigned to another member"
             >
               <Lock className="w-3 h-3" />
             </span>
           )}
 
           <span className="flex-shrink-0">{typeIcons[issue.type]}</span>
-          <span className="text-xs text-gray-400 font-medium truncate">{issue.key}</span>
+          <span className="text-[11px] font-mono text-[#B8F28B] font-semibold truncate">{issue.key}</span>
         </div>
 
-        {/* Priority arrow */}
+        {/* Priority */}
         {issue.priority && (
-          <div className={`flex-shrink-0 ${priorityColors[issue.priority]}`} title={`Priority: ${issue.priority}`}>
-            <svg className="w-4 h-4" fill={priorityArrowColor[issue.priority]} viewBox="0 0 20 20">
+          <div className={`flex-shrink-0 flex items-center gap-1 text-[10px] capitalize font-medium ${priorityColors[issue.priority]}`} title={`Priority: ${issue.priority}`}>
+            <svg className="w-3 h-3" fill={priorityArrowColor[issue.priority]} viewBox="0 0 20 20">
               <path d="M10 3l7 7-7 7V3z" />
             </svg>
           </div>
@@ -113,51 +111,51 @@ export const IssueCard: React.FC<IssueCardProps> = ({
       </div>
 
       {/* Title */}
-      <h4 className="text-sm text-[#172B4D] font-medium mb-2 line-clamp-2 leading-snug">
+      <h4 className="text-xs text-[#E9F5E9] font-medium mb-3 line-clamp-2 leading-relaxed">
         {issue.title}
       </h4>
 
-      {/* Footer — estimate + assignee avatar */}
-      <div className="flex items-center justify-between mt-1">
+      {/* Footer: Estimate, Assignee, Labels */}
+      <div className="flex items-center justify-between pt-1 border-t border-[#304A39]/60">
         {issue.estimatedHours != null ? (
-          <div className="flex items-center gap-1 text-xs text-gray-400">
-            <Calendar className="w-3 h-3" />
+          <div className="flex items-center gap-1 text-[11px] text-[#A7BDAA] font-mono">
+            <Calendar className="w-3 h-3 text-[#77C98A]" />
             <span>{issue.estimatedHours}h</span>
           </div>
         ) : (
-          <span />
+          <div />
         )}
 
         {assignee ? (
           <div
-            className="w-6 h-6 rounded-full bg-gradient-to-br from-purple-400 to-pink-400 flex items-center justify-center text-white text-[10px] font-semibold ml-auto"
-            title={assignee.name}
+            className="w-5 h-5 rounded-md bg-[#17231B] border border-[#304A39] text-[#B8F28B] flex items-center justify-center text-[9px] font-mono font-bold"
+            title={`Assigned to: ${assignee.name}`}
           >
             {getInitials(assignee.name)}
           </div>
         ) : (
           <div
-            className="w-6 h-6 rounded-full border border-dashed border-gray-300 flex items-center justify-center ml-auto"
+            className="w-5 h-5 rounded-md border border-dashed border-[#304A39] flex items-center justify-center text-[#A7BDAA]/40 text-[9px]"
             title="Unassigned"
           >
-            <span className="text-gray-300 text-[9px]">?</span>
+            -
           </div>
         )}
       </div>
 
       {/* Labels */}
       {issue.labels && issue.labels.length > 0 && (
-        <div className="flex flex-wrap gap-1 mt-2">
+        <div className="flex flex-wrap gap-1 mt-2.5">
           {issue.labels.slice(0, 2).map((label, idx) => (
             <span
               key={idx}
-              className="px-1.5 py-0.5 bg-gray-100 text-gray-500 rounded text-[10px] font-medium"
+              className="px-1.5 py-0.2 bg-[#132018] border border-[#304A39] text-[#A7BDAA] rounded text-[9px] font-mono"
             >
-              {label}
+              #{label}
             </span>
           ))}
           {issue.labels.length > 2 && (
-            <span className="px-1.5 py-0.5 bg-gray-100 text-gray-400 rounded text-[10px]">
+            <span className="px-1 py-0.2 bg-[#132018] text-[#A7BDAA] rounded text-[9px]">
               +{issue.labels.length - 2}
             </span>
           )}

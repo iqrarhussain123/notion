@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
 import { IssueDetailModal } from '../IssueDetailModal';
 import { Issue } from '../../types';
+import { ShieldCheck } from 'lucide-react';
 
 export const TeamView: React.FC = () => {
   const { users, issues } = useApp();
@@ -9,15 +10,18 @@ export const TeamView: React.FC = () => {
   const [expandedUser, setExpandedUser] = useState<string | null>(null);
 
   return (
-    <div>
-      <h2 className="text-2xl font-semibold text-[#172B4D] mb-6">Team Members</h2>
+    <div className="space-y-6">
+      <div>
+        <h2 className="text-xl font-bold text-[#E9F5E9]">Agency Team Roster</h2>
+        <p className="text-xs text-[#A7BDAA] mt-0.5">Cinemora Studios team members, roles, permissions, and active workload.</p>
+      </div>
 
       {users.length === 0 ? (
-        <div className="bg-white rounded-lg border border-gray-200 p-12 text-center">
-          <p className="text-gray-500">No team members yet.</p>
+        <div className="bg-[#17231B] border border-[#304A39] rounded-2xl p-12 text-center">
+          <p className="text-[#A7BDAA] text-xs">No team members registered yet.</p>
         </div>
       ) : (
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {users.map(user => {
             const userIssues = issues.filter(i => i.assigneeId === user.id);
             const completed = userIssues.filter(i => i.status === 'done').length;
@@ -25,64 +29,67 @@ export const TeamView: React.FC = () => {
             const isExpanded = expandedUser === user.id;
 
             return (
-              <div key={user.id} className="bg-white rounded-lg border border-gray-200">
+              <div key={user.id} className="bg-[#17231B] border border-[#304A39] rounded-2xl overflow-hidden shadow-sm">
                 <div
-                  className="p-6 cursor-pointer"
+                  className="p-5 cursor-pointer hover:bg-[#1B2B21]/50 transition-colors"
                   onClick={() => setExpandedUser(isExpanded ? null : user.id)}
                 >
-                  <div className="flex items-center gap-4 mb-4">
-                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-purple-400 to-pink-400 flex items-center justify-center text-white font-medium text-lg flex-shrink-0">
+                  <div className="flex items-center gap-3.5 mb-4">
+                    <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-[#B8F28B] to-[#77C98A] flex items-center justify-center text-[#101914] font-bold text-sm flex-shrink-0">
                       {user.name.split(' ').map(n => n[0]).join('')}
                     </div>
-                    <div className="min-w-0">
-                      <h3 className="font-semibold text-gray-900 truncate">{user.name}</h3>
-                      <p className="text-sm text-gray-500 truncate">{user.email}</p>
-                      <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${
-                        user.role === 'admin'
-                          ? 'bg-purple-100 text-purple-700'
-                          : 'bg-blue-100 text-blue-700'
-                      }`}>
-                        {user.role}
-                      </span>
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center gap-2">
+                        <h3 className="font-bold text-sm text-[#E9F5E9] truncate">{user.name}</h3>
+                        <span className={`text-[10px] px-2 py-0.5 rounded-full font-mono flex items-center gap-1 ${
+                          user.role === 'admin'
+                            ? 'bg-[#B8F28B]/10 text-[#B8F28B] border border-[#304A39]'
+                            : 'bg-[#77C98A]/10 text-[#77C98A] border border-[#304A39]'
+                        }`}>
+                          {user.role === 'admin' && <ShieldCheck className="w-3 h-3" />}
+                          {user.role === 'admin' ? 'Founder / Admin' : 'Member'}
+                        </span>
+                      </div>
+                      <p className="text-xs font-mono text-[#A7BDAA] truncate mt-0.5">{user.email}</p>
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-3 gap-3 text-center">
-                    <div className="bg-gray-50 rounded-lg p-2">
-                      <div className="text-xl font-bold text-[#0052CC]">{userIssues.length}</div>
-                      <div className="text-xs text-gray-500">Assigned</div>
+                  <div className="grid grid-cols-3 gap-2.5 text-center">
+                    <div className="bg-[#132018] border border-[#304A39] rounded-xl p-2.5">
+                      <div className="text-lg font-bold font-mono text-[#E9F5E9]">{userIssues.length}</div>
+                      <div className="text-[10px] text-[#A7BDAA] mt-0.5">Assigned</div>
                     </div>
-                    <div className="bg-gray-50 rounded-lg p-2">
-                      <div className="text-xl font-bold text-yellow-500">{inProgress}</div>
-                      <div className="text-xs text-gray-500">Active</div>
+                    <div className="bg-[#132018] border border-[#304A39] rounded-xl p-2.5">
+                      <div className="text-lg font-bold font-mono text-amber-400">{inProgress}</div>
+                      <div className="text-[10px] text-[#A7BDAA] mt-0.5">Active</div>
                     </div>
-                    <div className="bg-gray-50 rounded-lg p-2">
-                      <div className="text-xl font-bold text-green-500">{completed}</div>
-                      <div className="text-xs text-gray-500">Done</div>
+                    <div className="bg-[#132018] border border-[#304A39] rounded-xl p-2.5">
+                      <div className="text-lg font-bold font-mono text-[#B8F28B]">{completed}</div>
+                      <div className="text-[10px] text-[#A7BDAA] mt-0.5">Done</div>
                     </div>
                   </div>
                 </div>
 
                 {/* Expanded issue list */}
                 {isExpanded && userIssues.length > 0 && (
-                  <div className="border-t border-gray-100">
-                    <div className="px-4 py-2 bg-gray-50 text-xs font-semibold text-gray-500 uppercase">
-                      Assigned Issues
+                  <div className="border-t border-[#304A39]/60 bg-[#132018]">
+                    <div className="px-4 py-2 text-[10px] font-semibold text-[#A7BDAA] uppercase tracking-wider font-mono">
+                      Assigned Deliverables ({userIssues.length})
                     </div>
-                    <div className="divide-y divide-gray-50">
+                    <div className="divide-y divide-[#304A39]/40">
                       {userIssues.map(issue => (
                         <div
                           key={issue.id}
                           onClick={() => setSelectedIssue(issue)}
-                          className="px-4 py-2 hover:bg-gray-50 cursor-pointer flex items-center gap-2 group"
+                          className="px-4 py-2.5 hover:bg-[#1B2B21] cursor-pointer flex items-center gap-2.5 group transition-colors"
                         >
-                          <span className="text-xs text-gray-400 font-mono w-16 flex-shrink-0">{issue.key}</span>
-                          <span className="text-xs text-gray-700 flex-1 truncate group-hover:text-[#0052CC]">{issue.title}</span>
-                          <span className={`text-xs px-2 py-0.5 rounded-full flex-shrink-0 ${
-                            issue.status === 'done' ? 'bg-green-100 text-green-700'
-                            : issue.status === 'in-progress' ? 'bg-blue-100 text-blue-700'
-                            : issue.status === 'in-review' ? 'bg-purple-100 text-purple-700'
-                            : 'bg-gray-100 text-gray-600'
+                          <span className="text-xs font-mono text-[#B8F28B] w-16 flex-shrink-0">{issue.key}</span>
+                          <span className="text-xs text-[#E9F5E9] flex-1 truncate group-hover:text-[#B8F28B]">{issue.title}</span>
+                          <span className={`text-[10px] px-2 py-0.5 rounded-full flex-shrink-0 ${
+                            issue.status === 'done' ? 'bg-[#B8F28B]/10 text-[#B8F28B] border border-[#304A39]'
+                            : issue.status === 'in-progress' ? 'bg-[#77C98A]/10 text-[#77C98A] border border-[#304A39]'
+                            : issue.status === 'in-review' ? 'bg-blue-900/20 text-blue-300 border border-[#304A39]'
+                            : 'bg-[#17231B] text-[#A7BDAA] border border-[#304A39]'
                           }`}>
                             {issue.status}
                           </span>
@@ -93,8 +100,8 @@ export const TeamView: React.FC = () => {
                 )}
 
                 {isExpanded && userIssues.length === 0 && (
-                  <div className="border-t border-gray-100 px-4 py-4 text-center text-xs text-gray-400">
-                    No issues assigned
+                  <div className="border-t border-[#304A39]/60 px-4 py-4 text-center text-xs text-[#A7BDAA] bg-[#132018]">
+                    No deliverables currently assigned
                   </div>
                 )}
               </div>
