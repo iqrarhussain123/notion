@@ -199,8 +199,8 @@ export const pullFromCloudflare = async (): Promise<AppState | null> => {
       updatedAt?: string;
     };
 
-    if (resJson.status === 'not_found' || !resJson.data) {
-      // Remote D1 is empty: seed it with current local state!
+    if (resJson.status === 'not_found' || !resJson.data || !resJson.data.project) {
+      // Remote D1 is empty or uninitialized: seed it with current local state!
       const current = getData();
       await pushToCloudflare(true);
       return current;
