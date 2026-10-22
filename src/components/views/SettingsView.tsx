@@ -1,17 +1,33 @@
 import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
 import { InviteMemberModal } from '../InviteMemberModal';
-import { Plus, Save, Info, Mail, Globe, ShieldCheck } from 'lucide-react';
+import { Plus, Save, Info, Mail, Globe, ShieldCheck, Lock } from 'lucide-react';
 import { UserRole } from '../../types';
 
 export const SettingsView: React.FC = () => {
-  const { project, currentUser, invitations, inviteUser, logout, updateProject } = useApp();
+  const { project, currentUser, invitations, inviteUser, logout, updateProject, updatePassword } = useApp();
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
   const [projectName, setProjectName] = useState(project.name);
   const [projectDesc, setProjectDesc] = useState(project.description);
   const [saved, setSaved] = useState(false);
+  const [newPassword, setNewPassword] = useState('');
+  const [pwSaved, setPwSaved] = useState(false);
+  const [pwError, setPwError] = useState('');
 
   const isAdmin = currentUser?.role === 'admin';
+
+  const handlePasswordChange = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newPassword.trim() || newPassword.length < 4) {
+      setPwError('Password must be at least 4 characters');
+      return;
+    }
+    updatePassword(newPassword.trim());
+    setPwSaved(true);
+    setNewPassword('');
+    setPwError('');
+    setTimeout(() => setPwSaved(false), 3000);
+  };
 
   const handleSaveProject = () => {
     if (!projectName.trim()) return;
@@ -210,6 +226,38 @@ export const SettingsView: React.FC = () => {
               </div>
             </div>
           </div>
+
+          {/* Change Password Form */}
+          <form onSubmit={handlePasswordChange} className="mt-5 pt-4 border-t border-[#304A39]">
+            <label className="block text-[10px] font-semibold text-[#A7BDAA] uppercase tracking-wider mb-2">
+              Update Workspace Access Password
+            </label>
+            <div className="flex gap-2.5 max-w-md">
+              <div className="relative flex-1">
+                <Lock className="w-3.5 h-3.5 text-[#A7BDAA] absolute left-3 top-1/2 -translate-y-1/2" />
+                <input
+                  type="password"
+                  value={newPassword}
+                  onChange={(e) => {
+                    setNewPassword(e.target.value);
+                    if (pwError) setPwError('');
+                  }}
+                  placeholder="Enter new password…"
+                  className="w-full pl-9 pr-3 py-2 bg-[#132018] border border-[#304A39] rounded-xl text-xs text-[#E9F5E9] focus:outline-none focus:border-[#B8F28B]"
+                />
+              </div>
+              <button
+                type="submit"
+                disabled={!newPassword.trim()}
+                className="px-4 py-2 bg-[#B8F28B] text-[#101914] font-semibold rounded-xl hover:bg-[#77C98A] transition-colors text-xs disabled:opacity-40 cursor-pointer whitespace-nowrap"
+              >
+                Change Password
+              </button>
+            </div>
+            {pwError && <p className="text-[10px] text-rose-400 mt-1.5">{pwError}</p>}
+            {pwSaved && <p className="text-[10px] text-[#B8F28B] mt-1.5 font-medium">✓ Password updated successfully in local storage.</p>}
+          </form>
+
           <div className="mt-5 pt-4 border-t border-[#304A39] flex items-center justify-between">
             <span className="text-[11px] text-[#A7BDAA]">Browser-persisted internal workspace session</span>
             <button

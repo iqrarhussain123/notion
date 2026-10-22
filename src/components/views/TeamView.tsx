@@ -1,19 +1,32 @@
 import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
 import { IssueDetailModal } from '../IssueDetailModal';
+import { InviteMemberModal } from '../InviteMemberModal';
 import { Issue } from '../../types';
-import { ShieldCheck } from 'lucide-react';
+import { ShieldCheck, UserPlus } from 'lucide-react';
 
 export const TeamView: React.FC = () => {
-  const { users, issues } = useApp();
+  const { users, issues, currentUser, inviteUser } = useApp();
   const [selectedIssue, setSelectedIssue] = useState<Issue | null>(null);
   const [expandedUser, setExpandedUser] = useState<string | null>(null);
+  const [isInviteOpen, setIsInviteOpen] = useState(false);
 
   return (
     <div className="space-y-6">
-      <div>
-        <h2 className="text-xl font-bold text-[#E9F5E9]">Agency Team Roster</h2>
-        <p className="text-xs text-[#A7BDAA] mt-0.5">Cinemora Studios team members, roles, permissions, and active workload.</p>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h2 className="text-xl font-bold text-[#E9F5E9]">Agency Team Roster</h2>
+          <p className="text-xs text-[#A7BDAA] mt-0.5">Cinemora Studios team members, roles, permissions, and active workload.</p>
+        </div>
+        {currentUser?.role === 'admin' && (
+          <button
+            onClick={() => setIsInviteOpen(true)}
+            className="flex items-center gap-2 px-3.5 py-2 bg-[#B8F28B] text-[#101914] text-xs font-semibold rounded-xl hover:bg-[#77C98A] transition-colors cursor-pointer self-start sm:self-auto shadow-sm"
+          >
+            <UserPlus className="w-4 h-4" />
+            Invite Member / Co-Founder
+          </button>
+        )}
       </div>
 
       {users.length === 0 ? (
@@ -114,6 +127,17 @@ export const TeamView: React.FC = () => {
         <IssueDetailModal
           issue={selectedIssue}
           onClose={() => setSelectedIssue(null)}
+        />
+      )}
+
+      {isInviteOpen && (
+        <InviteMemberModal
+          isOpen={isInviteOpen}
+          onClose={() => setIsInviteOpen(false)}
+          onSubmit={(email, role) => {
+            inviteUser(email, role);
+            setIsInviteOpen(false);
+          }}
         />
       )}
     </div>

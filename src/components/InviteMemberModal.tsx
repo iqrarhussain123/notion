@@ -54,7 +54,7 @@ export const InviteMemberModal: React.FC<InviteMemberModalProps> = ({
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="w-full px-3.5 py-2.5 bg-[#17231B] border border-[#304A39] rounded-xl text-xs text-[#E9F5E9] focus:outline-none focus:border-[#B8F28B]"
-              placeholder="collaborator@cinemorastudios.com"
+              placeholder="collaborator@cinemorastudios.agency"
               required
             />
           </div>
@@ -68,8 +68,8 @@ export const InviteMemberModal: React.FC<InviteMemberModalProps> = ({
               onChange={(e) => setRole(e.target.value as UserRole)}
               className="w-full px-3.5 py-2.5 bg-[#17231B] border border-[#304A39] rounded-xl text-xs text-[#E9F5E9] focus:outline-none focus:border-[#B8F28B]"
             >
-              <option value="member">Member (Task Drag & Delivery)</option>
-              <option value="admin">Admin (Full Sprint & Task Management)</option>
+              <option value="member">Team Member (Task Drag & Sprint Delivery)</option>
+              <option value="admin">Co-Founder / Admin (Full Workspace, Sprint & Team Management)</option>
             </select>
             <p className="text-[10px] text-[#A7BDAA] mt-1.5 flex items-center gap-1">
               <ShieldCheck className="w-3 h-3 text-[#77C98A]" />

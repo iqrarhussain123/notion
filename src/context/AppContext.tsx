@@ -10,6 +10,7 @@ interface AppContextType {
   isAuthenticated: boolean;
   login: (email: string, password: string) => boolean;
   signup: (name: string, email: string, password: string) => boolean;
+  updatePassword: (newPassword: string) => boolean;
   logout: () => void;
 
   // Project
@@ -79,6 +80,13 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     setCurrentUser(user);
     refreshData();
     return true;
+  };
+
+  const updatePassword = (newPassword: string): boolean => {
+    if (!currentUser) return false;
+    const ok = db.updatePassword(currentUser.id, newPassword);
+    if (ok) refreshData();
+    return ok;
   };
 
   const logout = () => {
@@ -246,6 +254,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         isAuthenticated: !!currentUser,
         login,
         signup,
+        updatePassword,
         logout,
         project: appState.project,
         updateProject,

@@ -1,4 +1,5 @@
 node_modules/
+dist/
 
 INTERVIEW_PREP.md
 workflow.md

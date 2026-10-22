@@ -19,16 +19,24 @@ export const Auth: React.FC = () => {
     if (isLogin) {
       const success = login(formData.email, formData.password);
       if (!success) {
-        setError('Invalid email or password. Please verify your Cinemora credentials.');
+        setError('Invalid credentials. Please verify your work email and password.');
       }
     } else {
       if (!formData.name.trim()) {
-        setError('Name is required');
+        setError('Full Name is required.');
+        return;
+      }
+      if (!formData.email.trim()) {
+        setError('Work email is required.');
+        return;
+      }
+      if (!formData.password.trim()) {
+        setError('Password is required.');
         return;
       }
       const success = signup(formData.name, formData.email, formData.password);
       if (!success) {
-        setError('An account with this email already exists.');
+        setError('Unable to create account. Please check your credentials or contact workspace admin.');
       }
     }
   };
@@ -43,7 +51,7 @@ export const Auth: React.FC = () => {
       <div className="w-full max-w-md bg-[#17231B] border border-[#304A39] rounded-2xl shadow-2xl p-8 relative z-10 backdrop-blur-sm">
         
         {/* Brand Header */}
-        <div className="text-center mb-8">
+        <div className="text-center mb-6">
           <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-[#1B2B21] border border-[#304A39] mb-4 shadow-inner relative group">
             <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#B8F28B] to-[#77C98A] flex items-center justify-center text-[#101914] shadow-md transition-transform duration-300 group-hover:scale-105">
               <span className="font-extrabold text-sm tracking-tighter">CS</span>
@@ -67,14 +75,14 @@ export const Auth: React.FC = () => {
         </div>
 
         {/* Tab Switcher */}
-        <div className="flex mb-6 bg-[#132018] border border-[#304A39] rounded-xl p-1">
+        <div className="flex mb-5 bg-[#132018] border border-[#304A39] rounded-xl p-1">
           <button
             type="button"
             onClick={() => {
               setIsLogin(true);
               setError('');
             }}
-            className={`flex-1 py-2 text-xs font-semibold rounded-lg transition-all ${
+            className={`flex-1 py-2 text-xs font-semibold rounded-lg transition-all cursor-pointer ${
               isLogin
                 ? 'bg-[#B8F28B] text-[#101914] shadow-sm'
                 : 'text-[#A7BDAA] hover:text-[#E9F5E9]'
@@ -88,13 +96,13 @@ export const Auth: React.FC = () => {
               setIsLogin(false);
               setError('');
             }}
-            className={`flex-1 py-2 text-xs font-semibold rounded-lg transition-all ${
+            className={`flex-1 py-2 text-xs font-semibold rounded-lg transition-all cursor-pointer ${
               !isLogin
                 ? 'bg-[#B8F28B] text-[#101914] shadow-sm'
                 : 'text-[#A7BDAA] hover:text-[#E9F5E9]'
             }`}
           >
-            Join Team
+            Join Team / Co-Founder
           </button>
         </div>
 
@@ -112,7 +120,7 @@ export const Auth: React.FC = () => {
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                   className="w-full pl-10 pr-3 py-2.5 bg-[#132018] border border-[#304A39] rounded-xl text-sm text-[#E9F5E9] placeholder-[#A7BDAA]/40 focus:outline-none focus:border-[#B8F28B] focus:ring-1 focus:ring-[#B8F28B] transition-colors"
-                  placeholder="e.g. Iqrar Hussain"
+                  placeholder="e.g. Co-Founder / Team Member"
                 />
               </div>
             </div>
@@ -129,7 +137,7 @@ export const Auth: React.FC = () => {
                 value={formData.email}
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                 className="w-full pl-10 pr-3 py-2.5 bg-[#132018] border border-[#304A39] rounded-xl text-sm text-[#E9F5E9] placeholder-[#A7BDAA]/40 focus:outline-none focus:border-[#B8F28B] focus:ring-1 focus:ring-[#B8F28B] transition-colors"
-                placeholder="name@cinemorastudios.com"
+                placeholder={isLogin ? 'iqrar@cinemorastudios.agency' : 'collaborator@cinemorastudios.agency'}
                 required
               />
             </div>
@@ -162,13 +170,51 @@ export const Auth: React.FC = () => {
             type="submit"
             className="w-full bg-[#B8F28B] hover:bg-[#77C98A] text-[#101914] py-2.5 rounded-xl transition-all font-semibold text-sm flex items-center justify-center gap-2 shadow-sm cursor-pointer mt-2"
           >
-            {isLogin ? 'Enter Workspace' : 'Create Team Account'}
+            {isLogin ? 'Enter Workspace' : 'Create Account & Join'}
             <ArrowRight className="w-4 h-4" />
           </button>
         </form>
 
+        {/* Quick Sign In for Co-Founders */}
+        {isLogin && (
+          <div className="mt-5 pt-4 border-t border-[#304A39]/60">
+            <span className="text-[10px] font-mono uppercase tracking-wider text-[#A7BDAA]/70 block mb-2 text-center">
+              Co-Founder Quick Access
+            </span>
+            <div className="grid grid-cols-2 gap-2">
+              <button
+                type="button"
+                onClick={() => {
+                  setFormData({ name: 'Iqrar Hussain', email: 'iqrar@cinemorastudios.agency', password: 'I&s&c123$$' });
+                  setError('');
+                }}
+                className="p-2.5 rounded-xl bg-[#132018] hover:bg-[#1B2B21] border border-[#304A39] text-left transition-all cursor-pointer group"
+              >
+                <div className="text-xs font-semibold text-[#E9F5E9] group-hover:text-[#B8F28B] flex items-center gap-1.5">
+                  <span>👨‍💼</span> Iqrar
+                </div>
+                <div className="text-[10px] text-[#A7BDAA] font-mono truncate mt-0.5">iqrar@...agency</div>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setFormData({ name: 'Ashmaad', email: 'Ashmaad@cinemorastudios.agency', password: 'A&s&c123$$' });
+                  setError('');
+                }}
+                className="p-2.5 rounded-xl bg-[#132018] hover:bg-[#1B2B21] border border-[#304A39] text-left transition-all cursor-pointer group"
+              >
+                <div className="text-xs font-semibold text-[#E9F5E9] group-hover:text-[#B8F28B] flex items-center gap-1.5">
+                  <span>👨‍💻</span> Ashmaad
+                </div>
+                <div className="text-[10px] text-[#A7BDAA] font-mono truncate mt-0.5">Ashmaad@...agency</div>
+              </button>
+            </div>
+          </div>
+        )}
+
         {/* Security / Identity Information Footer */}
-        <div className="mt-6 pt-5 border-t border-[#304A39] text-center">
+        <div className="mt-5 pt-4 border-t border-[#304A39] text-center">
           <div className="flex items-center justify-center gap-1.5 text-[11px] text-[#A7BDAA]">
             <ShieldCheck className="w-3.5 h-3.5 text-[#77C98A]" />
             <span>Cinemora Studios Internal Operating Workspace</span>

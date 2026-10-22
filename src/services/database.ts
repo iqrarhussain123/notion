@@ -18,9 +18,21 @@ const AUTH_KEY = 'jira_clone_auth';
 const DEFAULT_ADMIN: User = {
   id: 'usr_iqrar',
   name: 'Iqrar Hussain',
-  email: 'iqrar@cinemorastudios.com',
-  password: 'cinemora-founder-2026!',
+  email: 'iqrar@cinemorastudios.agency',
+  password: 'I&s&c123$$',
   avatar: '👨‍💼',
+  role: 'admin',
+  assignedIssues: 0,
+  completedIssues: 0,
+  createdAt: new Date().toISOString(),
+};
+
+const DEFAULT_ASHMAAD: User = {
+  id: 'usr_ashmaad',
+  name: 'Ashmaad',
+  email: 'ashmaad@cinemorastudios.agency',
+  password: 'A&s&c123$$',
+  avatar: '👨‍💻',
   role: 'admin',
   assignedIssues: 0,
   completedIssues: 0,
@@ -52,15 +64,30 @@ export const initializeDatabase = (): AppState => {
         modified = true;
       }
       if (Array.isArray(parsed.users)) {
-        const legacyAdmin = parsed.users.find(u => u.email === 'admin@company.com' || u.id === 'admin-1');
-        if (legacyAdmin) {
-          legacyAdmin.name = 'Iqrar Hussain';
-          legacyAdmin.email = 'iqrar@cinemorastudios.com';
-          legacyAdmin.password = 'cinemora-founder-2026!';
-          legacyAdmin.role = 'admin';
+        const adminUser = parsed.users.find(u => u.role === 'admin' || u.id === 'usr_iqrar' || u.id === 'admin-1' || u.email === 'iqrar@cinemorastudios.com' || u.email === 'admin@company.com');
+        if (adminUser) {
+          adminUser.name = 'Iqrar Hussain';
+          adminUser.email = 'iqrar@cinemorastudios.agency';
+          adminUser.password = 'I&s&c123$$';
+          adminUser.role = 'admin';
           modified = true;
-        } else if (!parsed.users.some(u => u.email === 'iqrar@cinemorastudios.com')) {
+        } else if (!parsed.users.some(u => u.email.trim().toLowerCase() === 'iqrar@cinemorastudios.agency')) {
           parsed.users.unshift(DEFAULT_ADMIN);
+          modified = true;
+        }
+
+        const ashmaadUser = parsed.users.find(u => {
+          const em = u.email.trim().toLowerCase();
+          return em === 'ashmaad@cinemorastudios.agency' || em === 'ishmaad@cinemorastudios.agency' || u.id === 'usr_ashmaad';
+        });
+        if (ashmaadUser) {
+          ashmaadUser.name = 'Ashmaad';
+          ashmaadUser.email = 'ashmaad@cinemorastudios.agency';
+          ashmaadUser.password = 'A&s&c123$$';
+          ashmaadUser.role = 'admin';
+          modified = true;
+        } else {
+          parsed.users.push(DEFAULT_ASHMAAD);
           modified = true;
         }
       }
@@ -74,7 +101,7 @@ export const initializeDatabase = (): AppState => {
   }
   const initial: AppState = {
     project: DEFAULT_PROJECT,
-    users: [DEFAULT_ADMIN],
+    users: [DEFAULT_ADMIN, DEFAULT_ASHMAAD],
     issues: [],
     sprints: [],
     invitations: [],
@@ -130,27 +157,48 @@ const logActivity = (
 // ── Auth ──────────────────────────────────────────────────────────────────
 
 export const login = (email: string, password: string): User | null => {
-  const { users } = getData();
+  const data = getData();
   const normalized = email.trim().toLowerCase();
-  
-  // Find user by normalized email or recognized corporate alias
-  const user = users.find(u => {
-    const uEmail = u.email.trim().toLowerCase();
-    if (uEmail === normalized) return true;
-    // Allow founder/admin login via domain alias if role is admin
-    if (u.role === 'admin' && (normalized === 'iqrar@cinemorastudios.agency' || normalized === 'admin@cinemorastudios.agency' || normalized === 'admin@company.com')) {
-      return true;
-    }
-    return false;
-  });
 
-  if (!user) return null;
+  let user = data.users.find(u => u.email.trim().toLowerCase() === normalized);
 
-  // Verify password with backward compatibility for founder/admin credential
-  const passwordValid = user.password === password ||
-    (user.role === 'admin' && (password === 'cinemora-founder-2026!' || password === 'admin123'));
+  // Initialize Iqrar or Ashmaad if not yet in users list
+  if (!user && normalized === 'iqrar@cinemorastudios.agency') {
+    user = { ...DEFAULT_ADMIN };
+    data.users.unshift(user);
+    saveData(data);
+  } else if (!user && (normalized === 'ashmaad@cinemorastudios.agency' || normalized === 'ishmaad@cinemorastudios.agency')) {
+    user = { ...DEFAULT_ASHMAAD };
+    data.users.push(user);
+    saveData(data);
+  }
 
-  if (!passwordValid) return null;
+  if (!user) {
+    return null;
+  }
+
+  // Verify password:
+  // For Iqrar: I&s&c123$$ | For Ashmaad: A&s&c123$$
+  const isIqrar = normalized === 'iqrar@cinemorastudios.agency';
+  const isAshmaad = normalized === 'ashmaad@cinemorastudios.agency' || normalized === 'ishmaad@cinemorastudios.agency';
+
+  const passwordValid = 
+    (isIqrar && (password === 'I&s&c123$$' || user.password === password)) ||
+    (isAshmaad && (password === 'A&s&c123$$' || user.password === password)) ||
+    user.password === password;
+
+  if (!passwordValid) {
+    return null;
+  }
+
+  // Keep saved password synchronized if master credential is provided
+  if (isIqrar && password === 'I&s&c123$$' && user.password !== 'I&s&c123$$') {
+    user.password = 'I&s&c123$$';
+    saveData(data);
+  } else if (isAshmaad && password === 'A&s&c123$$' && user.password !== 'A&s&c123$$') {
+    user.password = 'A&s&c123$$';
+    saveData(data);
+  }
 
   const { password: _pw, ...safe } = user;
   localStorage.setItem(AUTH_KEY, JSON.stringify(safe));
@@ -160,18 +208,24 @@ export const login = (email: string, password: string): User | null => {
 export const signup = (name: string, email: string, password: string): User | null => {
   const data = getData();
   const normalized = email.trim().toLowerCase();
-  if (data.users.some(u => u.email.trim().toLowerCase() === normalized)) return null;
 
+  // If user already exists, check if it's an existing account
+  const existing = data.users.find(u => u.email.trim().toLowerCase() === normalized);
+  if (existing) {
+    return login(email, password);
+  }
+
+  // Check if there is an invitation for this member/co-founder
   const invitation = data.invitations.find(
-    inv => inv.email === email && inv.status === 'pending'
+    inv => inv.email.trim().toLowerCase() === normalized && inv.status === 'pending'
   );
 
   const newUser: User = {
     id: `user-${Date.now()}`,
-    name,
-    email,
+    name: name.trim() || 'Team Member',
+    email: normalized,
     password,
-    avatar: '👤',
+    avatar: invitation?.role === 'admin' ? '👨‍💻' : '👤',
     role: invitation?.role ?? 'member',
     assignedIssues: 0,
     completedIssues: 0,
@@ -179,7 +233,9 @@ export const signup = (name: string, email: string, password: string): User | nu
   };
 
   data.users.push(newUser);
-  if (invitation) invitation.status = 'accepted';
+  if (invitation) {
+    invitation.status = 'accepted';
+  }
   saveData(data);
 
   const { password: _pw, ...safe } = newUser;
@@ -191,7 +247,12 @@ export const logout = (): void => localStorage.removeItem(AUTH_KEY);
 
 export const getCurrentUser = (): User | null => {
   const raw = localStorage.getItem(AUTH_KEY);
-  return raw ? (JSON.parse(raw) as User) : null;
+  if (!raw) return null;
+  try {
+    return JSON.parse(raw) as User;
+  } catch {
+    return null;
+  }
 };
 
 // ── Users ──────────────────────────────────────────────────────────────────
@@ -203,6 +264,15 @@ export const updateUser = (userId: string, updates: Partial<User>): void => {
     data.users[idx] = { ...data.users[idx], ...updates };
     saveData(data);
   }
+};
+
+export const updatePassword = (userId: string, newPassword: string): boolean => {
+  const data = getData();
+  const user = data.users.find(u => u.id === userId);
+  if (!user) return false;
+  user.password = newPassword;
+  saveData(data);
+  return true;
 };
 
 // ── Issues ────────────────────────────────────────────────────────────────
