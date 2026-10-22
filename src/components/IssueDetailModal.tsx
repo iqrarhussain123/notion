@@ -72,7 +72,7 @@ export const IssueDetailModal: React.FC<IssueDetailModalProps> = ({ issue, onClo
 
   const typeIcons: Record<IssueType, string> = { story: '📖', task: '⚡', bug: '🐛', epic: '🎯' };
   const priorityColors: Record<IssuePriority, string> = {
-    lowest: 'text-[#8c93a8]', low: 'text-[#e5be60]', medium: 'text-amber-400',
+    lowest: 'text-[#A7BDAA]', low: 'text-[#77C98A]', medium: 'text-amber-400',
     high: 'text-orange-400', highest: 'text-rose-400',
   };
 
@@ -88,12 +88,12 @@ export const IssueDetailModal: React.FC<IssueDetailModalProps> = ({ issue, onClo
 
   return (
     <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <div className="bg-[#0e111a] border border-[#1c2232] rounded-2xl w-full max-w-3xl max-h-[90vh] flex flex-col shadow-2xl overflow-hidden">
+      <div className="bg-[#17231B] border border-[#304A39] rounded-2xl w-full max-w-3xl max-h-[90vh] flex flex-col shadow-2xl overflow-hidden">
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-[#1c2232] flex-shrink-0 bg-[#0e111a]">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-[#304A39] flex-shrink-0 bg-[#17231B]">
           <div className="flex items-center gap-2.5">
             <span className="text-base">{typeIcons[editedIssue.type]}</span>
-            <span className="text-xs font-mono font-bold text-[#d4a237] bg-[#141824] border border-[#1c2232] px-2 py-0.5 rounded-md">
+            <span className="text-xs font-mono font-bold text-[#B8F28B] bg-[#1B2B21] border border-[#304A39] px-2 py-0.5 rounded-md">
               {liveIssue.key}
             </span>
           </div>
@@ -107,7 +107,7 @@ export const IssueDetailModal: React.FC<IssueDetailModalProps> = ({ issue, onClo
             </button>
             <button
               onClick={onClose}
-              className="p-1.5 text-[#8c93a8] hover:text-[#f2f4f8] hover:bg-[#141824] rounded-lg transition-colors cursor-pointer"
+              className="p-1.5 text-[#A7BDAA] hover:text-[#E9F5E9] hover:bg-[#1B2B21] rounded-lg transition-colors cursor-pointer"
             >
               <X className="w-5 h-5" />
             </button>
@@ -115,15 +115,15 @@ export const IssueDetailModal: React.FC<IssueDetailModalProps> = ({ issue, onClo
         </div>
 
         {/* Tab Navigation */}
-        <div className="flex gap-1 px-6 pt-3 border-b border-[#1c2232] flex-shrink-0 bg-[#0e111a]">
+        <div className="flex gap-1 px-6 pt-3 border-b border-[#304A39] flex-shrink-0 bg-[#17231B]">
           {tabs.map(tab => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
               className={`flex items-center gap-1.5 px-3 py-2 text-xs font-semibold rounded-t-lg border-b-2 transition-colors cursor-pointer ${
                 activeTab === tab.id
-                  ? 'border-[#d4a237] text-[#d4a237] bg-[#141824]'
-                  : 'border-transparent text-[#8c93a8] hover:text-[#f2f4f8]'
+                  ? 'border-[#B8F28B] text-[#B8F28B] bg-[#1B2B21]'
+                  : 'border-transparent text-[#A7BDAA] hover:text-[#E9F5E9]'
               }`}
             >
               {tab.icon}
@@ -133,37 +133,37 @@ export const IssueDetailModal: React.FC<IssueDetailModalProps> = ({ issue, onClo
         </div>
 
         {/* Scrollable Body */}
-        <div className="flex-1 overflow-y-auto px-6 py-5 bg-[#10141f]">
+        <div className="flex-1 overflow-y-auto px-6 py-5 bg-[#132018]">
 
           {/* ---- DETAILS TAB ---- */}
           {activeTab === 'details' && (
             <div className="space-y-4">
               <div>
-                <label className="block text-[10px] font-semibold text-[#8c93a8] uppercase tracking-wider mb-1.5">Deliverable Title *</label>
+                <label className="block text-[10px] font-semibold text-[#A7BDAA] uppercase tracking-wider mb-1.5">Deliverable Title *</label>
                 <input
                   type="text"
                   value={editedIssue.title}
                   onChange={e => setEditedIssue({ ...editedIssue, title: e.target.value })}
                   onBlur={() => handleFieldBlur('title', editedIssue.title)}
-                  className="w-full px-3.5 py-2.5 bg-[#0e111a] border border-[#1c2232] rounded-xl text-xs text-[#f2f4f8] focus:outline-none focus:border-[#d4a237]"
+                  className="w-full px-3.5 py-2.5 bg-[#17231B] border border-[#304A39] rounded-xl text-xs text-[#E9F5E9] focus:outline-none focus:border-[#B8F28B]"
                 />
               </div>
 
               <div>
-                <label className="block text-[10px] font-semibold text-[#8c93a8] uppercase tracking-wider mb-1.5">Description & Scope</label>
+                <label className="block text-[10px] font-semibold text-[#A7BDAA] uppercase tracking-wider mb-1.5">Description & Scope</label>
                 <textarea
                   value={editedIssue.description}
                   onChange={e => setEditedIssue({ ...editedIssue, description: e.target.value })}
                   onBlur={() => handleFieldBlur('description', editedIssue.description)}
                   rows={4}
                   placeholder="Add scope details or execution steps..."
-                  className="w-full px-3.5 py-2.5 bg-[#0e111a] border border-[#1c2232] rounded-xl text-xs text-[#f2f4f8] focus:outline-none focus:border-[#d4a237] resize-none"
+                  className="w-full px-3.5 py-2.5 bg-[#17231B] border border-[#304A39] rounded-xl text-xs text-[#E9F5E9] focus:outline-none focus:border-[#B8F28B] resize-none"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-[10px] font-semibold text-[#8c93a8] uppercase tracking-wider mb-1.5">Status</label>
+                  <label className="block text-[10px] font-semibold text-[#A7BDAA] uppercase tracking-wider mb-1.5">Status</label>
                   <select
                     value={editedIssue.status}
                     onChange={e => {
@@ -171,7 +171,7 @@ export const IssueDetailModal: React.FC<IssueDetailModalProps> = ({ issue, onClo
                       setEditedIssue({ ...editedIssue, status: s });
                       updateIssue(issue.id, { status: s });
                     }}
-                    className="w-full px-3.5 py-2.5 bg-[#0e111a] border border-[#1c2232] rounded-xl text-xs text-[#f2f4f8] focus:outline-none focus:border-[#d4a237]"
+                    className="w-full px-3.5 py-2.5 bg-[#17231B] border border-[#304A39] rounded-xl text-xs text-[#E9F5E9] focus:outline-none focus:border-[#B8F28B]"
                   >
                     <option value="backlog">Backlog</option>
                     <option value="todo">To Do</option>
@@ -182,7 +182,7 @@ export const IssueDetailModal: React.FC<IssueDetailModalProps> = ({ issue, onClo
                 </div>
 
                 <div>
-                  <label className="block text-[10px] font-semibold text-[#8c93a8] uppercase tracking-wider mb-1.5">Priority</label>
+                  <label className="block text-[10px] font-semibold text-[#A7BDAA] uppercase tracking-wider mb-1.5">Priority</label>
                   <select
                     value={editedIssue.priority}
                     onChange={e => {
@@ -190,7 +190,7 @@ export const IssueDetailModal: React.FC<IssueDetailModalProps> = ({ issue, onClo
                       setEditedIssue({ ...editedIssue, priority: p });
                       updateIssue(issue.id, { priority: p });
                     }}
-                    className={`w-full px-3.5 py-2.5 bg-[#0e111a] border border-[#1c2232] rounded-xl text-xs focus:outline-none focus:border-[#d4a237] ${priorityColors[editedIssue.priority]}`}
+                    className={`w-full px-3.5 py-2.5 bg-[#17231B] border border-[#304A39] rounded-xl text-xs focus:outline-none focus:border-[#B8F28B] ${priorityColors[editedIssue.priority]}`}
                   >
                     <option value="lowest">Lowest</option>
                     <option value="low">Low</option>
@@ -201,7 +201,7 @@ export const IssueDetailModal: React.FC<IssueDetailModalProps> = ({ issue, onClo
                 </div>
 
                 <div>
-                  <label className="block text-[10px] font-semibold text-[#8c93a8] uppercase tracking-wider mb-1.5">Type</label>
+                  <label className="block text-[10px] font-semibold text-[#A7BDAA] uppercase tracking-wider mb-1.5">Type</label>
                   <select
                     value={editedIssue.type}
                     onChange={e => {
@@ -209,7 +209,7 @@ export const IssueDetailModal: React.FC<IssueDetailModalProps> = ({ issue, onClo
                       setEditedIssue({ ...editedIssue, type: t });
                       updateIssue(issue.id, { type: t });
                     }}
-                    className="w-full px-3.5 py-2.5 bg-[#0e111a] border border-[#1c2232] rounded-xl text-xs text-[#f2f4f8] focus:outline-none focus:border-[#d4a237]"
+                    className="w-full px-3.5 py-2.5 bg-[#17231B] border border-[#304A39] rounded-xl text-xs text-[#E9F5E9] focus:outline-none focus:border-[#B8F28B]"
                   >
                     <option value="task">⚡ Task</option>
                     <option value="story">📖 Story</option>
@@ -219,7 +219,7 @@ export const IssueDetailModal: React.FC<IssueDetailModalProps> = ({ issue, onClo
                 </div>
 
                 <div>
-                  <label className="block text-[10px] font-semibold text-[#8c93a8] uppercase tracking-wider mb-1.5">Assignee</label>
+                  <label className="block text-[10px] font-semibold text-[#A7BDAA] uppercase tracking-wider mb-1.5">Assignee</label>
                   <select
                     value={editedIssue.assigneeId ?? ''}
                     onChange={e => {
@@ -227,7 +227,7 @@ export const IssueDetailModal: React.FC<IssueDetailModalProps> = ({ issue, onClo
                       setEditedIssue({ ...editedIssue, assigneeId: val });
                       updateIssue(issue.id, { assigneeId: val });
                     }}
-                    className="w-full px-3.5 py-2.5 bg-[#0e111a] border border-[#1c2232] rounded-xl text-xs text-[#f2f4f8] focus:outline-none focus:border-[#d4a237]"
+                    className="w-full px-3.5 py-2.5 bg-[#17231B] border border-[#304A39] rounded-xl text-xs text-[#E9F5E9] focus:outline-none focus:border-[#B8F28B]"
                   >
                     <option value="">Unassigned</option>
                     {users.map(u => (
@@ -237,7 +237,7 @@ export const IssueDetailModal: React.FC<IssueDetailModalProps> = ({ issue, onClo
                 </div>
 
                 <div>
-                  <label className="block text-[10px] font-semibold text-[#8c93a8] uppercase tracking-wider mb-1.5">Estimated Hours</label>
+                  <label className="block text-[10px] font-semibold text-[#A7BDAA] uppercase tracking-wider mb-1.5">Estimated Hours</label>
                   <input
                     type="number"
                     min="0"
@@ -245,25 +245,25 @@ export const IssueDetailModal: React.FC<IssueDetailModalProps> = ({ issue, onClo
                     value={editedIssue.estimatedHours ?? ''}
                     onChange={e => setEditedIssue({ ...editedIssue, estimatedHours: e.target.value ? parseFloat(e.target.value) : undefined })}
                     onBlur={() => handleFieldBlur('estimatedHours', editedIssue.estimatedHours)}
-                    className="w-full px-3.5 py-2.5 bg-[#0e111a] border border-[#1c2232] rounded-xl text-xs text-[#f2f4f8] focus:outline-none focus:border-[#d4a237]"
+                    className="w-full px-3.5 py-2.5 bg-[#17231B] border border-[#304A39] rounded-xl text-xs text-[#E9F5E9] focus:outline-none focus:border-[#B8F28B]"
                     placeholder="0"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-[10px] font-semibold text-[#8c93a8] uppercase tracking-wider mb-1.5">Tags / Labels</label>
+                  <label className="block text-[10px] font-semibold text-[#A7BDAA] uppercase tracking-wider mb-1.5">Tags / Labels</label>
                   <input
                     type="text"
                     value={editedIssue.labels?.join(', ') ?? ''}
                     onChange={e => setEditedIssue({ ...editedIssue, labels: e.target.value.split(',').map(l => l.trim()).filter(Boolean) })}
                     onBlur={() => handleFieldBlur('labels', editedIssue.labels)}
-                    className="w-full px-3.5 py-2.5 bg-[#0e111a] border border-[#1c2232] rounded-xl text-xs text-[#f2f4f8] focus:outline-none focus:border-[#d4a237]"
+                    className="w-full px-3.5 py-2.5 bg-[#17231B] border border-[#304A39] rounded-xl text-xs text-[#E9F5E9] focus:outline-none focus:border-[#B8F28B]"
                     placeholder="frontend, ai-system, brand"
                   />
                 </div>
               </div>
 
-              <div className="text-[11px] text-[#8c93a8] font-mono pt-3 border-t border-[#1c2232]/60 flex items-center justify-between">
+              <div className="text-[11px] text-[#A7BDAA] font-mono pt-3 border-t border-[#304A39]/60 flex items-center justify-between">
                 <span>Reporter: {getUserById(liveIssue.reporterId)?.name ?? 'Unknown'}</span>
                 <span>Created: {new Date(liveIssue.createdAt).toLocaleDateString()}</span>
                 <span>Updated: {new Date(liveIssue.updatedAt).toLocaleDateString()}</span>
@@ -276,37 +276,37 @@ export const IssueDetailModal: React.FC<IssueDetailModalProps> = ({ issue, onClo
             <div className="space-y-4">
               <div className="space-y-3">
                 {(liveIssue.comments ?? []).length === 0 && (
-                  <p className="text-xs text-[#8c93a8] text-center py-8">No comments recorded yet.</p>
+                  <p className="text-xs text-[#A7BDAA] text-center py-8">No comments recorded yet.</p>
                 )}
                 {(liveIssue.comments ?? []).map(c => {
                   const author = getUserById(c.userId);
                   return (
-                    <div key={c.id} className="bg-[#0e111a] border border-[#1c2232] p-3.5 rounded-xl">
+                    <div key={c.id} className="bg-[#17231B] border border-[#304A39] p-3.5 rounded-xl">
                       <div className="flex items-center gap-2 mb-1.5">
-                        <div className="w-5 h-5 rounded-md bg-[#141824] border border-[#1c2232] text-[#d4a237] flex items-center justify-center text-[10px] font-mono font-bold">
+                        <div className="w-5 h-5 rounded-md bg-[#1B2B21] border border-[#304A39] text-[#B8F28B] flex items-center justify-center text-[10px] font-mono font-bold">
                           {author?.name.split(' ').map(n => n[0]).join('') ?? '?'}
                         </div>
-                        <span className="font-semibold text-xs text-[#f2f4f8]">{author?.name ?? 'Unknown'}</span>
-                        <span className="text-[10px] text-[#8c93a8] font-mono">{new Date(c.createdAt).toLocaleString()}</span>
+                        <span className="font-semibold text-xs text-[#E9F5E9]">{author?.name ?? 'Unknown'}</span>
+                        <span className="text-[10px] text-[#A7BDAA] font-mono">{new Date(c.createdAt).toLocaleString()}</span>
                       </div>
-                      <p className="text-xs text-[#f2f4f8]/90 ml-7 leading-relaxed">{c.text}</p>
+                      <p className="text-xs text-[#E9F5E9]/90 ml-7 leading-relaxed">{c.text}</p>
                     </div>
                   );
                 })}
               </div>
-              <div className="flex gap-2 pt-3 border-t border-[#1c2232]">
+              <div className="flex gap-2 pt-3 border-t border-[#304A39]">
                 <input
                   type="text"
                   value={comment}
                   onChange={e => setComment(e.target.value)}
                   onKeyDown={e => e.key === 'Enter' && !e.shiftKey && handleAddComment()}
                   placeholder="Write a comment… (Press Enter to post)"
-                  className="flex-1 px-3.5 py-2.5 bg-[#0e111a] border border-[#1c2232] rounded-xl text-xs text-[#f2f4f8] focus:outline-none focus:border-[#d4a237]"
+                  className="flex-1 px-3.5 py-2.5 bg-[#17231B] border border-[#304A39] rounded-xl text-xs text-[#E9F5E9] focus:outline-none focus:border-[#B8F28B]"
                 />
                 <button
                   onClick={handleAddComment}
                   disabled={!comment.trim()}
-                  className="px-4 py-2.5 bg-[#d4a237] text-[#08090d] font-semibold rounded-xl text-xs hover:bg-[#e5be60] transition-colors disabled:opacity-40 cursor-pointer"
+                  className="px-4 py-2.5 bg-[#B8F28B] text-[#101914] font-semibold rounded-xl text-xs hover:bg-[#77C98A] transition-colors disabled:opacity-40 cursor-pointer"
                 >
                   Post
                 </button>
@@ -319,38 +319,38 @@ export const IssueDetailModal: React.FC<IssueDetailModalProps> = ({ issue, onClo
             <div className="space-y-4">
               <div className="space-y-2.5">
                 {(liveIssue.workLogs ?? []).length === 0 && (
-                  <p className="text-xs text-[#8c93a8] text-center py-8">No hours logged yet on this deliverable.</p>
+                  <p className="text-xs text-[#A7BDAA] text-center py-8">No hours logged yet on this deliverable.</p>
                 )}
                 {(liveIssue.workLogs ?? []).map(wl => {
                   const author = getUserById(wl.userId);
                   return (
-                    <div key={wl.id} className="bg-[#0e111a] border border-[#1c2232] p-3 rounded-xl flex items-start justify-between">
+                    <div key={wl.id} className="bg-[#17231B] border border-[#304A39] p-3 rounded-xl flex items-start justify-between">
                       <div>
                         <div className="flex items-center gap-2 mb-1">
-                          <div className="w-5 h-5 rounded-md bg-[#141824] border border-[#1c2232] text-[#e5be60] flex items-center justify-center text-[10px] font-mono font-bold">
+                          <div className="w-5 h-5 rounded-md bg-[#1B2B21] border border-[#304A39] text-[#77C98A] flex items-center justify-center text-[10px] font-mono font-bold">
                             {author?.name.split(' ').map(n => n[0]).join('') ?? '?'}
                           </div>
-                          <span className="font-semibold text-xs text-[#f2f4f8]">{author?.name ?? 'Unknown'}</span>
-                          <span className="text-[10px] text-[#8c93a8] font-mono">{new Date(wl.createdAt).toLocaleString()}</span>
+                          <span className="font-semibold text-xs text-[#E9F5E9]">{author?.name ?? 'Unknown'}</span>
+                          <span className="text-[10px] text-[#A7BDAA] font-mono">{new Date(wl.createdAt).toLocaleString()}</span>
                         </div>
-                        {wl.description && <p className="text-xs text-[#8c93a8] ml-7">{wl.description}</p>}
+                        {wl.description && <p className="text-xs text-[#A7BDAA] ml-7">{wl.description}</p>}
                       </div>
-                      <span className="bg-[#141824] border border-[#1c2232] text-[#d4a237] px-2 py-0.5 rounded-lg text-xs font-mono font-bold whitespace-nowrap ml-4">
+                      <span className="bg-[#1B2B21] border border-[#304A39] text-[#B8F28B] px-2 py-0.5 rounded-lg text-xs font-mono font-bold whitespace-nowrap ml-4">
                         {wl.timeSpent}h
                       </span>
                     </div>
                   );
                 })}
                 {(liveIssue.workLogs ?? []).length > 0 && (
-                  <div className="text-right text-xs font-mono font-semibold text-[#d4a237] pt-1">
+                  <div className="text-right text-xs font-mono font-semibold text-[#B8F28B] pt-1">
                     Total Time: {(liveIssue.workLogs ?? []).reduce((s, wl) => s + wl.timeSpent, 0)}h
                     {liveIssue.estimatedHours ? ` / ${liveIssue.estimatedHours}h estimated` : ''}
                   </div>
                 )}
               </div>
 
-              <div className="pt-3 border-t border-[#1c2232] space-y-2">
-                <h4 className="text-[10px] font-semibold text-[#8c93a8] uppercase tracking-wider">Log Hours Spent</h4>
+              <div className="pt-3 border-t border-[#304A39] space-y-2">
+                <h4 className="text-[10px] font-semibold text-[#A7BDAA] uppercase tracking-wider">Log Hours Spent</h4>
                 <div className="flex gap-2">
                   <input
                     type="number"
@@ -359,19 +359,19 @@ export const IssueDetailModal: React.FC<IssueDetailModalProps> = ({ issue, onClo
                     value={workHours}
                     onChange={e => setWorkHours(e.target.value)}
                     placeholder="Hours"
-                    className="w-24 px-3 py-2 bg-[#0e111a] border border-[#1c2232] rounded-xl text-xs text-[#f2f4f8] focus:outline-none focus:border-[#d4a237]"
+                    className="w-24 px-3 py-2 bg-[#17231B] border border-[#304A39] rounded-xl text-xs text-[#E9F5E9] focus:outline-none focus:border-[#B8F28B]"
                   />
                   <input
                     type="text"
                     value={workDesc}
                     onChange={e => setWorkDesc(e.target.value)}
                     placeholder="What tasks did you complete?"
-                    className="flex-1 px-3 py-2 bg-[#0e111a] border border-[#1c2232] rounded-xl text-xs text-[#f2f4f8] focus:outline-none focus:border-[#d4a237]"
+                    className="flex-1 px-3 py-2 bg-[#17231B] border border-[#304A39] rounded-xl text-xs text-[#E9F5E9] focus:outline-none focus:border-[#B8F28B]"
                   />
                   <button
                     onClick={handleLogWork}
                     disabled={!workHours || parseFloat(workHours) <= 0}
-                    className="px-4 py-2 bg-[#d4a237] text-[#08090d] font-semibold rounded-xl text-xs hover:bg-[#e5be60] transition-colors disabled:opacity-40 cursor-pointer"
+                    className="px-4 py-2 bg-[#B8F28B] text-[#101914] font-semibold rounded-xl text-xs hover:bg-[#77C98A] transition-colors disabled:opacity-40 cursor-pointer"
                   >
                     Log
                   </button>
@@ -385,20 +385,20 @@ export const IssueDetailModal: React.FC<IssueDetailModalProps> = ({ issue, onClo
             <div className="space-y-4">
               <div className="space-y-2">
                 {(liveIssue.links ?? []).length === 0 && (
-                  <p className="text-xs text-[#8c93a8] text-center py-8">No linked deliverables.</p>
+                  <p className="text-xs text-[#A7BDAA] text-center py-8">No linked deliverables.</p>
                 )}
                 {(liveIssue.links ?? []).map(link => {
                   const target = issues.find(i => i.id === link.targetIssueId);
                   return (
-                    <div key={link.id} className="flex items-center justify-between bg-[#0e111a] border border-[#1c2232] p-3 rounded-xl">
+                    <div key={link.id} className="flex items-center justify-between bg-[#17231B] border border-[#304A39] p-3 rounded-xl">
                       <div className="flex items-center gap-2.5">
-                        <span className="text-[10px] text-[#e5be60] bg-[#141824] border border-[#1c2232] px-2 py-0.5 rounded-md font-mono">{link.type}</span>
-                        <span className="text-xs font-mono font-semibold text-[#d4a237]">{target?.key}</span>
-                        <span className="text-xs text-[#f2f4f8]">{target?.title ?? 'Unknown issue'}</span>
+                        <span className="text-[10px] text-[#77C98A] bg-[#1B2B21] border border-[#304A39] px-2 py-0.5 rounded-md font-mono">{link.type}</span>
+                        <span className="text-xs font-mono font-semibold text-[#B8F28B]">{target?.key}</span>
+                        <span className="text-xs text-[#E9F5E9]">{target?.title ?? 'Unknown issue'}</span>
                       </div>
                       <button
                         onClick={() => removeIssueLink(issue.id, link.id)}
-                        className="p-1 hover:bg-rose-950/40 rounded text-[#8c93a8] hover:text-rose-400 transition-colors cursor-pointer"
+                        className="p-1 hover:bg-rose-950/40 rounded text-[#A7BDAA] hover:text-rose-400 transition-colors cursor-pointer"
                       >
                         <X className="w-3.5 h-3.5" />
                       </button>
@@ -407,13 +407,13 @@ export const IssueDetailModal: React.FC<IssueDetailModalProps> = ({ issue, onClo
                 })}
               </div>
 
-              <div className="pt-3 border-t border-[#1c2232] space-y-2">
-                <h4 className="text-[10px] font-semibold text-[#8c93a8] uppercase tracking-wider">Connect Deliverable</h4>
+              <div className="pt-3 border-t border-[#304A39] space-y-2">
+                <h4 className="text-[10px] font-semibold text-[#A7BDAA] uppercase tracking-wider">Connect Deliverable</h4>
                 <div className="flex gap-2">
                   <select
                     value={linkType}
                     onChange={e => setLinkType(e.target.value as typeof linkType)}
-                    className="w-36 px-2.5 py-2 bg-[#0e111a] border border-[#1c2232] rounded-xl text-xs text-[#f2f4f8] focus:outline-none focus:border-[#d4a237]"
+                    className="w-36 px-2.5 py-2 bg-[#17231B] border border-[#304A39] rounded-xl text-xs text-[#E9F5E9] focus:outline-none focus:border-[#B8F28B]"
                   >
                     <option value="relates-to">Relates to</option>
                     <option value="blocks">Blocks</option>
@@ -424,7 +424,7 @@ export const IssueDetailModal: React.FC<IssueDetailModalProps> = ({ issue, onClo
                   <select
                     value={linkTargetId}
                     onChange={e => setLinkTargetId(e.target.value)}
-                    className="flex-1 px-3 py-2 bg-[#0e111a] border border-[#1c2232] rounded-xl text-xs text-[#f2f4f8] focus:outline-none focus:border-[#d4a237]"
+                    className="flex-1 px-3 py-2 bg-[#17231B] border border-[#304A39] rounded-xl text-xs text-[#E9F5E9] focus:outline-none focus:border-[#B8F28B]"
                   >
                     <option value="">Select target issue...</option>
                     {linkableIssues.map(i => (
@@ -434,7 +434,7 @@ export const IssueDetailModal: React.FC<IssueDetailModalProps> = ({ issue, onClo
                   <button
                     onClick={handleLinkIssue}
                     disabled={!linkTargetId}
-                    className="px-4 py-2 bg-[#d4a237] text-[#08090d] font-semibold rounded-xl text-xs hover:bg-[#e5be60] transition-colors disabled:opacity-40 flex items-center gap-1 cursor-pointer"
+                    className="px-4 py-2 bg-[#B8F28B] text-[#101914] font-semibold rounded-xl text-xs hover:bg-[#77C98A] transition-colors disabled:opacity-40 flex items-center gap-1 cursor-pointer"
                   >
                     <Plus className="w-3.5 h-3.5" />
                     Link
@@ -449,28 +449,28 @@ export const IssueDetailModal: React.FC<IssueDetailModalProps> = ({ issue, onClo
             <div className="space-y-4">
               <div className="space-y-2">
                 {(liveIssue.attachments ?? []).length === 0 && (
-                  <p className="text-xs text-[#8c93a8] text-center py-8">No files or assets attached.</p>
+                  <p className="text-xs text-[#A7BDAA] text-center py-8">No files or assets attached.</p>
                 )}
                 {(liveIssue.attachments ?? []).map(att => (
-                  <div key={att.id} className="flex items-center justify-between bg-[#0e111a] border border-[#1c2232] p-3 rounded-xl">
+                  <div key={att.id} className="flex items-center justify-between bg-[#17231B] border border-[#304A39] p-3 rounded-xl">
                     <div className="flex items-center gap-2.5 min-w-0">
-                      <Paperclip className="w-4 h-4 text-[#e5be60] flex-shrink-0" />
+                      <Paperclip className="w-4 h-4 text-[#77C98A] flex-shrink-0" />
                       <div className="min-w-0">
                         <a
                           href={att.data}
                           download={att.name}
-                          className="text-xs font-medium text-[#d4a237] hover:underline truncate block"
+                          className="text-xs font-medium text-[#B8F28B] hover:underline truncate block"
                         >
                           {att.name}
                         </a>
-                        <span className="text-[10px] text-[#8c93a8] font-mono">
+                        <span className="text-[10px] text-[#A7BDAA] font-mono">
                           {(att.size / 1024).toFixed(1)} KB · {getUserById(att.uploadedBy)?.name} · {new Date(att.uploadedAt).toLocaleDateString()}
                         </span>
                       </div>
                     </div>
                     <button
                       onClick={() => removeAttachment(issue.id, att.id)}
-                      className="p-1 hover:bg-rose-950/40 rounded text-[#8c93a8] hover:text-rose-400 transition-colors ml-2 flex-shrink-0 cursor-pointer"
+                      className="p-1 hover:bg-rose-950/40 rounded text-[#A7BDAA] hover:text-rose-400 transition-colors ml-2 flex-shrink-0 cursor-pointer"
                     >
                       <X className="w-3.5 h-3.5" />
                     </button>
@@ -478,10 +478,10 @@ export const IssueDetailModal: React.FC<IssueDetailModalProps> = ({ issue, onClo
                 ))}
               </div>
 
-              <div className="pt-3 border-t border-[#1c2232]">
-                <label className="flex items-center justify-center gap-2 px-4 py-3 border border-dashed border-[#1c2232] hover:border-[#e5be60] bg-[#0e111a] rounded-xl cursor-pointer transition-colors">
-                  <Plus className="w-4 h-4 text-[#e5be60]" />
-                  <span className="text-xs text-[#f2f4f8] font-medium">Attach File / Asset</span>
+              <div className="pt-3 border-t border-[#304A39]">
+                <label className="flex items-center justify-center gap-2 px-4 py-3 border border-dashed border-[#304A39] hover:border-[#77C98A] bg-[#17231B] rounded-xl cursor-pointer transition-colors">
+                  <Plus className="w-4 h-4 text-[#77C98A]" />
+                  <span className="text-xs text-[#E9F5E9] font-medium">Attach File / Asset</span>
                   <input type="file" className="hidden" onChange={handleFileUpload} />
                 </label>
               </div>

@@ -90,34 +90,34 @@ export const CreateIssueModal: React.FC<CreateIssueModalProps> = ({ isOpen, onCl
   };
 
   const typeIcons: Record<IssueType, React.ReactNode> = {
-    story: <BookOpen className="w-3.5 h-3.5 text-[#e5be60]" />,
-    task: <CheckSquare className="w-3.5 h-3.5 text-[#d4a237]" />,
+    story: <BookOpen className="w-3.5 h-3.5 text-[#77C98A]" />,
+    task: <CheckSquare className="w-3.5 h-3.5 text-[#B8F28B]" />,
     bug: <Bug className="w-3.5 h-3.5 text-rose-400" />,
     epic: <Trophy className="w-3.5 h-3.5 text-purple-400" />,
   };
 
   return (
     <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <div className="bg-[#0e111a] border border-[#1c2232] rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl">
+      <div className="bg-[#17231B] border border-[#304A39] rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl">
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-[#1c2232] bg-[#0e111a] sticky top-0 z-10">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-[#304A39] bg-[#17231B] sticky top-0 z-10">
           <div className="flex items-center gap-2">
-            <Sparkles className="w-4 h-4 text-[#d4a237]" />
-            <h2 className="text-sm font-bold text-[#f2f4f8]">New Workspace Deliverable</h2>
+            <Sparkles className="w-4 h-4 text-[#B8F28B]" />
+            <h2 className="text-sm font-bold text-[#E9F5E9]">New Workspace Deliverable</h2>
           </div>
           <button
             onClick={handleClose}
-            className="p-1.5 hover:bg-[#141824] rounded-lg text-[#8c93a8] hover:text-[#f2f4f8] transition-colors cursor-pointer"
+            className="p-1.5 hover:bg-[#1B2B21] rounded-lg text-[#A7BDAA] hover:text-[#E9F5E9] transition-colors cursor-pointer"
           >
             <X className="w-4 h-4" />
           </button>
         </div>
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="p-6 space-y-4 bg-[#10141f]">
+        <form onSubmit={handleSubmit} className="p-6 space-y-4 bg-[#132018]">
           {/* Deliverable Type */}
           <div>
-            <label className="block text-[10px] font-semibold text-[#8c93a8] uppercase tracking-wider mb-1.5">
+            <label className="block text-[10px] font-semibold text-[#A7BDAA] uppercase tracking-wider mb-1.5">
               Type
             </label>
             <div className="grid grid-cols-4 gap-2">
@@ -128,8 +128,8 @@ export const CreateIssueModal: React.FC<CreateIssueModalProps> = ({ isOpen, onCl
                   onClick={() => setFormData({ ...formData, type: t })}
                   className={`flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl border text-xs font-medium capitalize transition-all cursor-pointer ${
                     formData.type === t
-                      ? 'bg-[#141824] border-[#d4a237] text-[#f2f4f8] shadow-sm'
-                      : 'bg-[#0e111a] border-[#1c2232] text-[#8c93a8] hover:border-[#e5be60]'
+                      ? 'bg-[#1B2B21] border-[#B8F28B] text-[#E9F5E9] shadow-sm'
+                      : 'bg-[#17231B] border-[#304A39] text-[#A7BDAA] hover:border-[#77C98A]'
                   }`}
                 >
                   {typeIcons[t]}
@@ -141,7 +141,7 @@ export const CreateIssueModal: React.FC<CreateIssueModalProps> = ({ isOpen, onCl
 
           {/* Title */}
           <div>
-            <label className="block text-[10px] font-semibold text-[#8c93a8] uppercase tracking-wider mb-1.5">
+            <label className="block text-[10px] font-semibold text-[#A7BDAA] uppercase tracking-wider mb-1.5">
               Deliverable Title *
             </label>
             <input
@@ -152,8 +152,8 @@ export const CreateIssueModal: React.FC<CreateIssueModalProps> = ({ isOpen, onCl
                 if (titleError) setTitleError(false);
               }}
               placeholder="e.g. Implement pipeline qualification agent hook"
-              className={`w-full px-3.5 py-2.5 bg-[#0e111a] border rounded-xl text-xs text-[#f2f4f8] placeholder-[#8c93a8]/40 focus:outline-none ${
-                titleError ? 'border-rose-500' : 'border-[#1c2232] focus:border-[#d4a237]'
+              className={`w-full px-3.5 py-2.5 bg-[#17231B] border rounded-xl text-xs text-[#E9F5E9] placeholder-[#A7BDAA]/40 focus:outline-none ${
+                titleError ? 'border-rose-500' : 'border-[#304A39] focus:border-[#B8F28B]'
               }`}
             />
             {titleError && (
@@ -163,7 +163,7 @@ export const CreateIssueModal: React.FC<CreateIssueModalProps> = ({ isOpen, onCl
 
           {/* Description */}
           <div>
-            <label className="block text-[10px] font-semibold text-[#8c93a8] uppercase tracking-wider mb-1.5">
+            <label className="block text-[10px] font-semibold text-[#A7BDAA] uppercase tracking-wider mb-1.5">
               Description & Acceptance Criteria
             </label>
             <textarea
@@ -171,20 +171,20 @@ export const CreateIssueModal: React.FC<CreateIssueModalProps> = ({ isOpen, onCl
               onChange={e => setFormData({ ...formData, description: e.target.value })}
               rows={3}
               placeholder="Detailed description, assets needed, or technical instructions..."
-              className="w-full px-3.5 py-2.5 bg-[#0e111a] border border-[#1c2232] rounded-xl text-xs text-[#f2f4f8] placeholder-[#8c93a8]/40 focus:outline-none focus:border-[#d4a237] resize-none"
+              className="w-full px-3.5 py-2.5 bg-[#17231B] border border-[#304A39] rounded-xl text-xs text-[#E9F5E9] placeholder-[#A7BDAA]/40 focus:outline-none focus:border-[#B8F28B] resize-none"
             />
           </div>
 
           {/* Status & Priority */}
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-[10px] font-semibold text-[#8c93a8] uppercase tracking-wider mb-1.5">
+              <label className="block text-[10px] font-semibold text-[#A7BDAA] uppercase tracking-wider mb-1.5">
                 Initial Status
               </label>
               <select
                 value={formData.status}
                 onChange={e => setFormData({ ...formData, status: e.target.value as IssueStatus })}
-                className="w-full px-3.5 py-2.5 bg-[#0e111a] border border-[#1c2232] rounded-xl text-xs text-[#f2f4f8] focus:outline-none focus:border-[#d4a237]"
+                className="w-full px-3.5 py-2.5 bg-[#17231B] border border-[#304A39] rounded-xl text-xs text-[#E9F5E9] focus:outline-none focus:border-[#B8F28B]"
               >
                 <option value="backlog">Backlog (Unassigned)</option>
                 <option value="todo">To Do</option>
@@ -195,13 +195,13 @@ export const CreateIssueModal: React.FC<CreateIssueModalProps> = ({ isOpen, onCl
             </div>
 
             <div>
-              <label className="block text-[10px] font-semibold text-[#8c93a8] uppercase tracking-wider mb-1.5">
+              <label className="block text-[10px] font-semibold text-[#A7BDAA] uppercase tracking-wider mb-1.5">
                 Priority
               </label>
               <select
                 value={formData.priority}
                 onChange={e => setFormData({ ...formData, priority: e.target.value as IssuePriority })}
-                className="w-full px-3.5 py-2.5 bg-[#0e111a] border border-[#1c2232] rounded-xl text-xs text-[#f2f4f8] focus:outline-none focus:border-[#d4a237]"
+                className="w-full px-3.5 py-2.5 bg-[#17231B] border border-[#304A39] rounded-xl text-xs text-[#E9F5E9] focus:outline-none focus:border-[#B8F28B]"
               >
                 <option value="lowest">Lowest</option>
                 <option value="low">Low</option>
@@ -215,13 +215,13 @@ export const CreateIssueModal: React.FC<CreateIssueModalProps> = ({ isOpen, onCl
           {/* Assignee & Hours */}
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-[10px] font-semibold text-[#8c93a8] uppercase tracking-wider mb-1.5">
+              <label className="block text-[10px] font-semibold text-[#A7BDAA] uppercase tracking-wider mb-1.5">
                 Assignee
               </label>
               <select
                 value={formData.assigneeId}
                 onChange={e => setFormData({ ...formData, assigneeId: e.target.value })}
-                className="w-full px-3.5 py-2.5 bg-[#0e111a] border border-[#1c2232] rounded-xl text-xs text-[#f2f4f8] focus:outline-none focus:border-[#d4a237]"
+                className="w-full px-3.5 py-2.5 bg-[#17231B] border border-[#304A39] rounded-xl text-xs text-[#E9F5E9] focus:outline-none focus:border-[#B8F28B]"
               >
                 <option value="">Unassigned</option>
                 {users.map(u => (
@@ -231,7 +231,7 @@ export const CreateIssueModal: React.FC<CreateIssueModalProps> = ({ isOpen, onCl
             </div>
 
             <div>
-              <label className="block text-[10px] font-semibold text-[#8c93a8] uppercase tracking-wider mb-1.5">
+              <label className="block text-[10px] font-semibold text-[#A7BDAA] uppercase tracking-wider mb-1.5">
                 Estimated Hours
               </label>
               <input
@@ -241,14 +241,14 @@ export const CreateIssueModal: React.FC<CreateIssueModalProps> = ({ isOpen, onCl
                 value={formData.estimatedHours}
                 onChange={e => setFormData({ ...formData, estimatedHours: e.target.value })}
                 placeholder="e.g. 4.5"
-                className="w-full px-3.5 py-2.5 bg-[#0e111a] border border-[#1c2232] rounded-xl text-xs text-[#f2f4f8] placeholder-[#8c93a8]/40 focus:outline-none focus:border-[#d4a237]"
+                className="w-full px-3.5 py-2.5 bg-[#17231B] border border-[#304A39] rounded-xl text-xs text-[#E9F5E9] placeholder-[#A7BDAA]/40 focus:outline-none focus:border-[#B8F28B]"
               />
             </div>
           </div>
 
           {/* Labels */}
           <div>
-            <label className="block text-[10px] font-semibold text-[#8c93a8] uppercase tracking-wider mb-1.5">
+            <label className="block text-[10px] font-semibold text-[#A7BDAA] uppercase tracking-wider mb-1.5">
               Tags / Labels (comma-separated)
             </label>
             <input
@@ -256,22 +256,22 @@ export const CreateIssueModal: React.FC<CreateIssueModalProps> = ({ isOpen, onCl
               value={formData.labels}
               onChange={e => setFormData({ ...formData, labels: e.target.value })}
               placeholder="frontend, outreach, automation"
-              className="w-full px-3.5 py-2.5 bg-[#0e111a] border border-[#1c2232] rounded-xl text-xs text-[#f2f4f8] placeholder-[#8c93a8]/40 focus:outline-none focus:border-[#d4a237]"
+              className="w-full px-3.5 py-2.5 bg-[#17231B] border border-[#304A39] rounded-xl text-xs text-[#E9F5E9] placeholder-[#A7BDAA]/40 focus:outline-none focus:border-[#B8F28B]"
             />
           </div>
 
           {/* Actions */}
-          <div className="flex gap-2.5 justify-end pt-4 border-t border-[#1c2232]">
+          <div className="flex gap-2.5 justify-end pt-4 border-t border-[#304A39]">
             <button
               type="button"
               onClick={handleClose}
-              className="px-4 py-2 text-xs text-[#8c93a8] hover:text-[#f2f4f8] transition-colors cursor-pointer"
+              className="px-4 py-2 text-xs text-[#A7BDAA] hover:text-[#E9F5E9] transition-colors cursor-pointer"
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="px-5 py-2 bg-[#d4a237] text-[#08090d] font-semibold rounded-xl text-xs hover:bg-[#e5be60] transition-colors shadow-sm cursor-pointer"
+              className="px-5 py-2 bg-[#B8F28B] text-[#101914] font-semibold rounded-xl text-xs hover:bg-[#77C98A] transition-colors shadow-sm cursor-pointer"
             >
               Create Deliverable
             </button>
