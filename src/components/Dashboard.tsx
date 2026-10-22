@@ -344,7 +344,7 @@ export const Dashboard: React.FC = () => {
       <div className="w-64 bg-indigo-900 text-white flex flex-col">
         <div className="p-6">
           <h1 className="text-2xl font-bold">Cinemora Studios</h1>
-          <p className="text-sm text-[#77C98A]">Agency Workspace</p>
+          <p className="text-sm text-[#e5be60]">Agency Workspace</p>
         </div>
 
         <nav className="flex-1 px-4 space-y-1">

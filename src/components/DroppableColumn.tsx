@@ -17,18 +17,18 @@ export const DroppableColumn: React.FC<DroppableColumnProps> = ({ id, title, cou
     <div className="flex-shrink-0 w-80">
       <div
         ref={setNodeRef}
-        className={`bg-[#17231B] border border-[#304A39] rounded-2xl p-3.5 min-h-[550px] transition-all ${
-          isOver ? 'bg-[#1B2B21] border-[#B8F28B] ring-1 ring-[#B8F28B] shadow-lg' : ''
+        className={`bg-[#0e111a] border border-[#1c2232] rounded-2xl p-3.5 min-h-[550px] transition-all ${
+          isOver ? 'bg-[#141824] border-[#d4a237] ring-1 ring-[#d4a237] shadow-lg' : ''
         }`}
       >
         <div className="flex items-center justify-between mb-3 px-1">
           <div className="flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-[#77C98A]" />
-            <h3 className="text-xs font-bold text-[#E9F5E9] tracking-wider uppercase font-mono">
+            <span className="w-2 h-2 rounded-full bg-[#e5be60]" />
+            <h3 className="text-xs font-bold text-[#f2f4f8] tracking-wider uppercase font-mono">
               {title}
             </h3>
           </div>
-          <span className="bg-[#1B2B21] border border-[#304A39] text-[#B8F28B] px-2 py-0.5 rounded-full text-xs font-mono font-semibold">
+          <span className="bg-[#141824] border border-[#1c2232] text-[#d4a237] px-2 py-0.5 rounded-full text-xs font-mono font-semibold">
             {count}
           </span>
         </div>

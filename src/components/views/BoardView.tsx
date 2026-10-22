@@ -92,24 +92,24 @@ export const BoardView: React.FC = () => {
     <div className="h-full flex flex-col">
       {/* Sprint label & Permissions Header */}
       {activeSprint ? (
-        <div className="mb-4 flex items-center justify-between flex-wrap gap-3 bg-[#17231B] border border-[#304A39] p-3.5 rounded-2xl">
+        <div className="mb-4 flex items-center justify-between flex-wrap gap-3 bg-[#0e111a] border border-[#1c2232] p-3.5 rounded-2xl">
           <div className="flex items-center gap-2.5">
-            <div className="w-2 h-2 rounded-full bg-[#B8F28B] animate-pulse" />
-            <span className="text-xs text-[#A7BDAA]">Active Sprint:</span>
-            <span className="text-xs font-bold text-[#E9F5E9] tracking-wide">{activeSprint.name}</span>
+            <div className="w-2 h-2 rounded-full bg-[#d4a237] animate-pulse" />
+            <span className="text-xs text-[#8c93a8]">Active Sprint:</span>
+            <span className="text-xs font-bold text-[#f2f4f8] tracking-wide">{activeSprint.name}</span>
             {activeSprint.goal && (
-              <span className="text-xs text-[#A7BDAA] hidden md:inline">• {activeSprint.goal}</span>
+              <span className="text-xs text-[#8c93a8] hidden md:inline">• {activeSprint.goal}</span>
             )}
           </div>
 
           <div className="flex items-center gap-2">
             {/* Permission banner for non-admin members */}
             {!isAdmin && (
-              <div className="flex items-center gap-1.5 px-3 py-1 bg-[#1B2B21] border border-[#304A39] rounded-xl text-xs text-[#77C98A]">
+              <div className="flex items-center gap-1.5 px-3 py-1 bg-[#141824] border border-[#1c2232] rounded-xl text-xs text-[#e5be60]">
                 <Info className="w-3.5 h-3.5 flex-shrink-0" />
                 <span>
                   Moving{' '}
-                  <strong className="text-[#B8F28B]">
+                  <strong className="text-[#d4a237]">
                     {draggableCount === 0 ? '0' : draggableCount}
                   </strong>{' '}
                   assigned tasks
@@ -119,17 +119,17 @@ export const BoardView: React.FC = () => {
 
             {/* Admin badge */}
             {isAdmin && (
-              <div className="flex items-center gap-1.5 px-3 py-1 bg-[#1B2B21] border border-[#304A39] rounded-xl text-xs text-[#B8F28B] font-medium">
-                <ShieldCheck className="w-3.5 h-3.5 flex-shrink-0 text-[#B8F28B]" />
+              <div className="flex items-center gap-1.5 px-3 py-1 bg-[#141824] border border-[#1c2232] rounded-xl text-xs text-[#d4a237] font-medium">
+                <ShieldCheck className="w-3.5 h-3.5 flex-shrink-0 text-[#d4a237]" />
                 <span>Founder / Admin Mode</span>
               </div>
             )}
           </div>
         </div>
       ) : (
-        <div className="mb-4 p-4 bg-[#17231B] border border-[#304A39] rounded-2xl flex items-center justify-between">
-          <div className="flex items-center gap-2.5 text-xs text-[#A7BDAA]">
-            <Zap className="w-4 h-4 text-[#77C98A]" />
+        <div className="mb-4 p-4 bg-[#0e111a] border border-[#1c2232] rounded-2xl flex items-center justify-between">
+          <div className="flex items-center gap-2.5 text-xs text-[#8c93a8]">
+            <Zap className="w-4 h-4 text-[#e5be60]" />
             <span>No sprint currently active. Switch to Backlog to launch a planned sprint or work directly on backlog tasks.</span>
           </div>
         </div>
